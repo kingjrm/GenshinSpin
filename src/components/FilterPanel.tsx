@@ -56,8 +56,7 @@ export default function FilterPanel({
             placeholder="Search characters..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-4 pr-10 py-3 bg-black/40 border border-gold/20 rounded-md text-white placeholder-muted focus:border-gold outline-none transition-all"
-            style={{ width: "100%" }}
+            className="search-input"
           />
           {search && (
             <button

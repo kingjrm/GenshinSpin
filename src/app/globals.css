@@ -277,4 +277,5 @@ select:focus, select:hover {
 .transition-transform { transition: transform 0.2s ease; }
 .duration-300 { transition-duration: 300ms; }
 .select-none { user-select: none; }
+.overflow-hidden { overflow: hidden; }
 

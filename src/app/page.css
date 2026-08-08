@@ -550,15 +550,19 @@ input:checked + .slider:before {
 
 /* Sleek wish capsule select buttons */
 .capsule-btn-group {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
   width: 100%;
-  flex-wrap: wrap;
 }
 
 .capsule-btn {
-  flex: 1 1 100px;
-  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 44px;
+  padding: 6px 8px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-muted);
@@ -570,6 +574,7 @@ input:checked + .slider:before {
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
+  line-height: 1.2;
 }
 
 .capsule-btn:hover {
@@ -818,3 +823,237 @@ input:checked + .slider:before {
   font-weight: 800;
   color: var(--text-gold);
 }
+
+/* --- Gacha Result Modal Overlay & Card --- */
+.result-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: rgba(3, 4, 7, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.result-card-container {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  border-radius: 22px;
+  border: 1px solid rgba(216, 179, 106, 0.45);
+  background: radial-gradient(circle at center, rgba(28, 35, 52, 0.98) 0%, rgba(9, 12, 18, 0.98) 100%);
+  animation: simpleReveal 0.3s ease-out forwards;
+}
+
+@keyframes simpleReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.result-glow {
+  position: absolute;
+  width: min(600px, 100%);
+  height: min(600px, 100%);
+  border-radius: 50%;
+  opacity: 0.2;
+  pointer-events: none;
+  animation: pulseGlow 3s infinite;
+}
+
+.result-portrait-wrap {
+  position: relative;
+  border-radius: 50%;
+  padding: 4px;
+  border: 2px solid rgba(216, 179, 106, 0.4);
+}
+
+.result-stars {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--text-gold);
+  text-shadow: 0 0 8px rgba(224, 152, 44, 0.8);
+}
+
+.result-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.result-remove-notice {
+  font-size: 0.72rem;
+  color: #ff8080;
+  font-weight: 600;
+  background: rgba(255, 80, 80, 0.1);
+  border: 1px solid rgba(255, 80, 80, 0.2);
+  padding: 6px 12px;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+}
+
+.result-btn-confirm {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background-color: var(--text-gold);
+  color: #0c1018;
+  font-family: var(--font-header);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(195,158,74,0.3);
+}
+
+.result-btn-confirm:hover {
+  background-color: var(--text-gold-hover);
+  box-shadow: 0 6px 18px rgba(195,158,74,0.5);
+  transform: translateY(-1px);
+}
+
+.result-btn-remove {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 80, 80, 0.3);
+  color: #ff8080;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.result-btn-remove:hover {
+  background: rgba(255, 80, 80, 0.08);
+  border-color: rgba(255, 80, 80, 0.6);
+  color: #ffa0a0;
+}
+
+/* --- Search Input Custom Styles --- */
+.search-input {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid rgba(216, 179, 106, 0.2) !important;
+  border-radius: 12px !important;
+  color: #fff !important;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  border-color: var(--border-gold) !important;
+  box-shadow: 0 0 0 3px rgba(216, 179, 106, 0.15) !important;
+}
+
+/* --- Empty Pool State & Reset Button --- */
+.result-empty-state {
+  min-height: 320px;
+  padding: 40px !important;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 450px;
+  width: 100%;
+  border-color: rgba(255, 96, 64, 0.25) !important;
+}
+
+.reset-empty-btn {
+  padding: 14px 28px;
+  border-radius: 12px;
+  background-color: var(--text-gold);
+  color: #0c1018;
+  font-family: var(--font-header);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(195,158,74,0.3);
+}
+
+.reset-empty-btn:hover {
+  background-color: var(--text-gold-hover);
+  box-shadow: 0 6px 18px rgba(195,158,74,0.5);
+  transform: translateY(-1px);
+}
+
+/* --- Responsive Wheel & Centerpiece Constrains --- */
+.wheel-wrapper {
+  max-width: 100%;
+}
+
+.wheel-centerpiece {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Wheel Button Text Sizing Fixes (vanilla CSS instead of broken Tailwind) */
+.wheel-spin-btn-title {
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: #24170a;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.wheel-spin-btn-subtitle {
+  font-size: 9px;
+  color: #4b3416;
+  font-weight: 700;
+  margin-top: -4px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .wheel-spin-btn-title {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+  
+  .wheel-spin-btn-subtitle {
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    margin-top: -2px;
+  }
+}
+

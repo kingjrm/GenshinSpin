@@ -51,7 +51,7 @@ export default function CharacterPool({
           <button
             onClick={onResetPool}
             className="capsule-btn"
-            style={{ flex: "0 0 auto", color: "var(--color-pyro)", borderColor: "rgba(255, 96, 64, 0.2)" }}
+            style={{ color: "var(--color-pyro)", borderColor: "rgba(255, 96, 64, 0.2)" }}
           >
             Reset
           </button>

@@ -44,19 +44,19 @@ export default function ResultCard({
 
   const overlay = (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-6 sm:pt-10 px-4 bg-black/80 backdrop-blur-md animate-fade-in"
+      className="result-overlay"
       onClick={onClose}
     >
       {/* Radiant Background Gacha Rays */}
       <div 
-        className="absolute w-[600px] h-[600px] rounded-full opacity-20 pointer-events-none animate-[pulseGlow_3s_infinite]"
+        className="result-glow"
         style={{
           background: `radial-gradient(circle, ${elementColor} 0%, transparent 70%)`,
         }}
       />
 
       <div
-        className="glass-panel relative w-full max-w-[360px] p-6 sm:p-7 text-center flex flex-col items-center gap-5 animate-reveal border border-gold/45"
+        className="result-card-container"
         style={{
           background: "radial-gradient(circle at center, rgba(28, 35, 52, 0.98) 0%, rgba(9, 12, 18, 0.98) 100%)",
           boxShadow: `0 24px 70px rgba(0, 0, 0, 0.75), 0 0 30px ${elementColor}25, inset 0 0 25px rgba(255,255,255,0.05)`,
@@ -71,7 +71,7 @@ export default function ResultCard({
 
         {/* Big Portrait Container */}
         <div 
-          className="relative rounded-full p-1 border-2 border-gold/40"
+          className="result-portrait-wrap"
           style={{
             boxShadow: `0 0 30px ${elementColor}40`,
           }}
@@ -91,10 +91,10 @@ export default function ResultCard({
           <h3 className="text-2xl sm:text-3xl font-bold tracking-wide text-white text-center">{character.name}</h3>
           
           {/* Rarity Stars */}
-          <div className="flex gap-1 justify-center">{renderStars(character.rarity)}</div>
+          <div className="result-stars">{renderStars(character.rarity)}</div>
 
           {/* Badges Layout */}
-          <div className="flex flex-wrap gap-2 justify-center mt-2">
+          <div className="result-tags">
             <span
               className="element-tag"
               style={{ color: elementColor, borderColor: `${elementColor}40` }}
@@ -116,7 +116,7 @@ export default function ResultCard({
 
         {/* Removal Indicator */}
         {removeAfterSpinEnabled && (
-          <p className="text-xs text-red-400 font-semibold bg-red-950/20 border border-red-500/20 px-3 py-1.5 rounded-md">
+          <p className="result-remove-notice">
             Removed from the character pool.
           </p>
         )}
@@ -125,10 +125,7 @@ export default function ResultCard({
         <div className="flex flex-col gap-3 w-full mt-2">
           <button
             onClick={onClose}
-            className="w-full py-3 rounded-md bg-gold hover:bg-gold-hover text-black font-extrabold uppercase tracking-wider text-sm transition-all shadow-lg hover:shadow-gold/20 cursor-pointer"
-            style={{
-              boxShadow: "0 4px 14px rgba(195,158,74,0.3)",
-            }}
+            className="result-btn-confirm"
           >
             Confirm Wish
           </button>
@@ -139,7 +136,7 @@ export default function ResultCard({
                 onRemoveCharacter(character.name);
                 onClose();
               }}
-              className="w-full py-2.5 rounded-md bg-transparent hover:bg-red-500/10 border border-red-500/30 hover:border-red-500/60 text-red-400 hover:text-red-300 font-bold text-xs tracking-wider transition-all cursor-pointer"
+              className="result-btn-remove"
             >
               Remove Character from Pool
             </button>

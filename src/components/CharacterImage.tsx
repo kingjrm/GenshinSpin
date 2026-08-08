@@ -55,6 +55,7 @@ export default function CharacterImage({
           height: size,
           background: gradient,
           borderRadius: "50%",
+          overflow: "hidden",
           boxShadow: `0 0 12px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.4)`,
           color: element === "Cryo" || element === "Anemo" ? "#111" : "#fff",
           display: "flex",
@@ -90,6 +91,7 @@ export default function CharacterImage({
         width: size,
         height: size,
         borderRadius: "50%",
+        overflow: "hidden",
         border: `2px solid ${rarity === 5 ? "var(--rarity-5)" : "var(--rarity-4)"}`,
         boxShadow: `0 4px 10px rgba(0, 0, 0, 0.4), 0 0 8px ${
           rarity === 5 ? "rgba(224, 152, 44, 0.2)" : "rgba(162, 86, 227, 0.2)"

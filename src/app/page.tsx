@@ -245,7 +245,7 @@ export default function Home() {
           <section className="center-area">
             {allCharactersSelectedGone ? (
               /* ALL CHARACTERS SELECTED SCREEN */
-              <div className="glass-panel result-empty-state p-10 text-center flex flex-col items-center gap-6 max-w-md w-full animate-fade-in border-red-500/25">
+              <div className="glass-panel result-empty-state">
                 <span className="text-4xl">🎉</span>
                 <h2 className="text-xl font-bold text-white uppercase tracking-wider">
                   All characters have been selected!
@@ -255,7 +255,7 @@ export default function Home() {
                 </p>
                 <button
                   onClick={handleResetWheel}
-                  className="px-6 py-3.5 rounded bg-gold text-black font-extrabold tracking-wider text-xs uppercase hover:bg-gold-hover transition-all cursor-pointer shadow-lg shadow-gold/10"
+                  className="reset-empty-btn"
                 >
                   Reset Wheel
                 </button>
