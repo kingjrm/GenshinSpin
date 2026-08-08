@@ -160,16 +160,11 @@ export default function Home() {
 
   // Global reset wheel
   const handleResetWheel = useCallback(() => {
-    const confirmReset = window.confirm(
-      "Are you sure you want to reset the wheel? This will restore all characters, clear your spin history, and reset all search filters."
-    );
-    if (confirmReset) {
-      setSelectedNames(new Set(charactersData.map((c) => c.name)));
-      handleResetFilters();
-      setResult(null);
-      setHistory([]);
-      setRemoveAfterSpin(false);
-    }
+    setSelectedNames(new Set(charactersData.map((c) => c.name)));
+    handleResetFilters();
+    setResult(null);
+    setHistory([]);
+    setRemoveAfterSpin(false);
   }, [handleResetFilters]);
 
   const allCharactersSelectedGone = selectedNames.size === 0;

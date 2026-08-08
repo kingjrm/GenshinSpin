@@ -1057,3 +1057,13 @@ input:checked + .slider:before {
   }
 }
 
+/* --- Pool Header --- */
+.pool-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(216, 179, 106, 0.15);
+}
+

@@ -28,7 +28,7 @@ export default function CharacterPool({
   return (
     <div className="glass-panel p-6 flex flex-col h-full w-full">
       {/* Pool Header Controls */}
-      <div className="flex flex-col gap-3 mb-4 pb-3 border-b border-gold/10">
+      <div className="pool-header">
         <div className="flex justify-between items-center">
           <h2 className="text-sm font-bold text-gold uppercase tracking-wider">Character Pool</h2>
           <span className="text-xs text-muted font-bold">

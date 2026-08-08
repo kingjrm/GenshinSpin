@@ -278,4 +278,19 @@ select:focus, select:hover {
 .duration-300 { transition-duration: 300ms; }
 .select-none { user-select: none; }
 .overflow-hidden { overflow: hidden; }
+.overflow-y-auto { overflow-y: auto; }
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+.text-3xl { font-size: 1.875rem; }
+.text-4xl { font-size: 2.25rem; }
+.text-muted { color: var(--text-muted); }
+.text-gold { color: var(--text-gold); }
+.text-white { color: #ffffff; }
+.text-purple { color: var(--rarity-4); }
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.uppercase { text-transform: uppercase; }
+.tracking-wider { letter-spacing: 0.05em; }
 
