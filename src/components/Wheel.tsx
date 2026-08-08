@@ -294,17 +294,17 @@ export default function Wheel({
           disabled={isSpinning || activeCharacters.length < 2}
           className="wheel-spin-btn"
         >
-          <span 
-            className="text-[14px] font-extrabold uppercase tracking-widest text-[#20160a]"
+          <span
+            className="text-[13px] sm:text-[14px] font-black uppercase tracking-[0.22em] text-[#24170a]"
             style={{
               fontFamily: "var(--font-header)",
-              textShadow: "0 1px 0 rgba(255,255,255,0.18)",
+              textShadow: "0 1px 0 rgba(255,255,255,0.2)",
             }}
           >
-            Spin
+            Wish
           </span>
-          <span className="text-[9px] text-[#3b2a12] font-bold -mt-0.5">
-            {activeCharacters.length} Active
+          <span className="text-[9px] sm:text-[10px] text-[#4b3416] font-bold -mt-1 tracking-[0.18em] uppercase">
+            Tap to Spin
           </span>
         </button>
       </div>

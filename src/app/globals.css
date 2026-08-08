@@ -113,6 +113,7 @@ button, input, select, textarea {
 /* Base Glassmorphic Layout Styles */
 .glass-panel {
   background: linear-gradient(180deg, rgba(16, 20, 30, 0.92) 0%, rgba(10, 14, 22, 0.82) 100%);
+  padding: clamp(18px, 2vw, 24px);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -124,6 +125,12 @@ button, input, select, textarea {
 .glass-panel:hover {
   border-color: rgba(216, 179, 106, 0.22);
   box-shadow: 0 22px 54px rgba(0, 0, 0, 0.42);
+}
+
+@media (max-width: 768px) {
+  .glass-panel {
+    padding: 16px;
+  }
 }
 
 /* Element color tags */

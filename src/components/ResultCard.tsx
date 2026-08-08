@@ -44,7 +44,7 @@ export default function ResultCard({
 
   const overlay = (
     <div
-      className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-6 sm:pt-10 px-4 bg-black/80 backdrop-blur-md animate-fade-in"
       onClick={onClose}
     >
       {/* Radiant Background Gacha Rays */}
@@ -56,7 +56,7 @@ export default function ResultCard({
       />
 
       <div
-        className="glass-panel relative w-full max-w-[420px] p-8 text-center flex flex-col items-center gap-6 animate-reveal border border-gold/45"
+        className="glass-panel relative w-full max-w-[360px] p-6 sm:p-7 text-center flex flex-col items-center gap-5 animate-reveal border border-gold/45"
         style={{
           background: "radial-gradient(circle at center, rgba(28, 35, 52, 0.98) 0%, rgba(9, 12, 18, 0.98) 100%)",
           boxShadow: `0 24px 70px rgba(0, 0, 0, 0.75), 0 0 30px ${elementColor}25, inset 0 0 25px rgba(255,255,255,0.05)`,
@@ -88,7 +88,7 @@ export default function ResultCard({
 
         {/* Character Title Info */}
         <div className="flex flex-col items-center gap-2">
-          <h3 className="text-3xl font-bold tracking-wide text-white text-center">{character.name}</h3>
+          <h3 className="text-2xl sm:text-3xl font-bold tracking-wide text-white text-center">{character.name}</h3>
           
           {/* Rarity Stars */}
           <div className="flex gap-1 justify-center">{renderStars(character.rarity)}</div>
