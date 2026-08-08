@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { createPortal } from "react-dom";
 import { Character } from "@/data/characters";
 import CharacterImage from "./CharacterImage";
 
@@ -41,7 +42,7 @@ export default function ResultCard({
     ));
   };
 
-  return (
+  const overlay = (
     <div
       className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
       onClick={onClose}
@@ -147,4 +148,10 @@ export default function ResultCard({
       </div>
     </div>
   );
+
+  if (typeof document === "undefined") {
+    return overlay;
+  }
+
+  return createPortal(overlay, document.body);
 }

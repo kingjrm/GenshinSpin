@@ -28,6 +28,10 @@
   animation: promoScroll 18s linear infinite;
 }
 
+.promo-bar:hover .promo-bar-track {
+  animation-play-state: paused;
+}
+
 .promo-pill {
   display: inline-flex;
   align-items: center;
@@ -391,6 +395,18 @@ input:checked + .slider:before {
   box-shadow: 0 16px 30px rgba(0, 0, 0, 0.42), inset 0 0 18px rgba(255, 255, 255, 0.18);
   transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   outline: none;
+  animation: spinButtonFloat 2.8s ease-in-out infinite;
+}
+
+.wheel-spin-btn::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 244, 205, 0.22);
+  opacity: 0.8;
+  animation: spinButtonRing 2.4s ease-out infinite;
+  pointer-events: none;
 }
 
 .wheel-spin-btn:hover {
@@ -403,6 +419,22 @@ input:checked + .slider:before {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+@keyframes spinButtonFloat {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.03); }
+}
+
+@keyframes spinButtonRing {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.22);
+    opacity: 0;
+  }
 }
 
 /* WISH ROSTER LIST DESIGN (PREVENTING MESSY OVERLAP) */
@@ -632,4 +664,163 @@ input:checked + .slider:before {
 
 .result-empty-state {
   min-height: 320px;
+}
+
+.history-panel {
+  gap: 14px;
+}
+
+.history-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.history-title {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-light);
+}
+
+.history-subtitle {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.history-clear-btn {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 82, 82, 0.22);
+  background: rgba(255, 82, 82, 0.08);
+  color: #ff9f9f;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.history-clear-btn:hover {
+  border-color: rgba(255, 82, 82, 0.42);
+  background: rgba(255, 82, 82, 0.14);
+  color: #ffd0d0;
+}
+
+.history-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 180px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.history-empty-icon {
+  font-size: 2rem;
+}
+
+.history-empty-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.history-empty-text {
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+}
+
+.history-item:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(216, 179, 106, 0.2);
+}
+
+.history-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.history-index {
+  width: 24px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(229, 194, 124, 0.65);
+  flex: 0 0 auto;
+}
+
+.history-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.history-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-light);
+  line-height: 1.15;
+}
+
+.history-element {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.history-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.history-region {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.history-rarity {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-gold);
 }

@@ -177,6 +177,10 @@ export default function Home() {
     "jeumwoo was here!",
     "ria sunget",
     "durp enge welkin sige na",
+    "UY PILIPINSS!!!!!",
+    "VOTE WISELY",
+    "Wishing u luck on 50/50",
+    "Snezhnaya na wahhhhh",
   ];
 
   return (
