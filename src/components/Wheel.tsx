@@ -293,14 +293,7 @@ export default function Wheel({
           onClick={spin}
           disabled={isSpinning || activeCharacters.length < 2}
           className="wheel-spin-btn"
-        >
-          <span className="wheel-spin-btn-title">
-            Wish
-          </span>
-          <span className="wheel-spin-btn-subtitle">
-            Tap to Spin
-          </span>
-        </button>
+        />
       </div>
 
       {activeCharacters.length < 2 && (
