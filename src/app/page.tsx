@@ -27,6 +27,22 @@ export default function Home() {
   const [removeAfterSpin, setRemoveAfterSpin] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
 
+  // Automatic intro fade-out effect after 1.5 seconds
+  React.useEffect(() => {
+    const fadeTimer = setTimeout(() => {
+      setFadeIntro(true);
+    }, 1500);
+
+    const removeTimer = setTimeout(() => {
+      setShowIntro(false);
+    }, 2300);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(removeTimer);
+    };
+  }, []);
+
   // Compute characters matching search/filter dropdowns
   const filteredCharacters = useMemo(() => {
     return charactersData.filter((char) => {
@@ -183,22 +199,11 @@ export default function Home() {
       {/* IMMERSIVE GACHA GATE INTRO */}
       {showIntro && (
         <div className={`intro-gate-container ${fadeIntro ? "fade-out" : ""}`}>
-          <div className="intro-content">
-            <span className="intro-subtitle">Genshin Wish Chamber</span>
-            <h1 className="intro-title">Destiny Wheel</h1>
-            <p className="intro-desc">
-              Summon your fate. Spin the wheel to randomly select from all 118 Genshin Impact characters. Customize active pools, filter by element or weapon type, and compile your history.
-            </p>
-            <button
-              onClick={() => {
-                setFadeIntro(true);
-                setTimeout(() => setShowIntro(false), 800);
-              }}
-              className="intro-btn"
-            >
-              Enter Wish Chamber
-            </button>
-          </div>
+          <img
+            src="/genspin.png"
+            alt="Genspin Logo"
+            className="intro-logo"
+          />
         </div>
       )}
 
