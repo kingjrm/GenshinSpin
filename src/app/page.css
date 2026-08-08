@@ -1,14 +1,51 @@
 /* Page Layout, Wheel Alignment, and Wish Roster List Styles */
 
 .app-container {
-  max-width: 1500px;
+  max-width: 1680px;
   margin: 0 auto;
-  padding: 28px 24px 40px;
+  padding: 14px 14px 28px;
   display: flex;
   flex-direction: column;
   gap: 24px;
   position: relative;
   z-index: 1;
+}
+
+.promo-bar {
+  overflow: hidden;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(90deg, rgba(216, 179, 106, 0.16) 0%, rgba(18, 24, 36, 0.94) 25%, rgba(18, 24, 36, 0.94) 75%, rgba(216, 179, 106, 0.16) 100%);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+}
+
+.promo-bar-track {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: max-content;
+  padding: 10px 18px;
+  animation: promoScroll 18s linear infinite;
+}
+
+.promo-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-light);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@keyframes promoScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 /* Introduction Gate Screen */
@@ -137,16 +174,16 @@
 /* Dashboard Layout */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 360px 1fr 320px;
-  gap: 22px;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) minmax(280px, 340px);
+  gap: 18px;
   align-items: start;
 }
 
 .sidebar-left {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  max-width: 360px;
+  gap: 14px;
+  max-width: 100%;
   width: 100%;
 }
 
@@ -154,16 +191,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   justify-content: center;
-  min-height: 550px;
+  min-height: min(78vh, 820px);
+  width: 100%;
 }
 
 .sidebar-right {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  max-width: 320px;
+  gap: 14px;
+  max-width: 100%;
   width: 100%;
 }
 
@@ -171,7 +209,7 @@
 .toggle-card {
   background: linear-gradient(180deg, rgba(16, 20, 30, 0.9) 0%, rgba(10, 14, 22, 0.78) 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 16px 18px;
+  padding: 14px 16px;
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -308,7 +346,7 @@ input:checked + .slider:before {
   align-items: center;
   justify-content: center;
   user-select: none;
-  gap: 12px;
+  gap: 10px;
 }
 
 .wheel-centerpiece {
@@ -316,11 +354,11 @@ input:checked + .slider:before {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  border-radius: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: linear-gradient(180deg, rgba(16, 20, 30, 0.86) 0%, rgba(8, 12, 19, 0.9) 100%);
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.52);
+  padding: 18px;
+  border-radius: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(180deg, rgba(20, 26, 38, 0.82) 0%, rgba(8, 12, 19, 0.96) 100%);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
 }
 
 .wheel-pointer {
@@ -343,22 +381,22 @@ input:checked + .slider:before {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: 1px solid rgba(216, 179, 106, 0.38);
+  border: 1px solid rgba(255, 244, 205, 0.42);
   width: 88px;
   height: 88px;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(25, 31, 45, 0.96) 0%, rgba(8, 12, 19, 1) 100%);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.45), inset 0 0 18px rgba(216, 179, 106, 0.08);
+  background: radial-gradient(circle, rgba(255, 239, 191, 0.98) 0%, rgba(227, 182, 95, 0.95) 55%, rgba(177, 125, 37, 0.98) 100%);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.42), inset 0 0 18px rgba(255, 255, 255, 0.18);
   transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   outline: none;
 }
 
 .wheel-spin-btn:hover {
   transform: translate(-50%, -50%) scale(1.05);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.52), inset 0 0 18px rgba(216, 179, 106, 0.14);
-  border-color: rgba(216, 179, 106, 0.65);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.5), inset 0 0 18px rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 244, 205, 0.72);
 }
 
 .wheel-spin-btn:disabled {
@@ -369,17 +407,18 @@ input:checked + .slider:before {
 
 /* WISH ROSTER LIST DESIGN (PREVENTING MESSY OVERLAP) */
 .pool-list-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
 }
 
 .pool-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 18px;
@@ -444,7 +483,8 @@ input:checked + .slider:before {
 
 /* Custom wish capsule active/disabled buttons */
 .pool-toggle-btn {
-  padding: 7px 12px;
+  width: 100%;
+  padding: 8px 12px;
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -480,10 +520,11 @@ input:checked + .slider:before {
   display: flex;
   gap: 10px;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .capsule-btn {
-  flex: 1;
+  flex: 1 1 100px;
   padding: 10px 12px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -518,10 +559,11 @@ input:checked + .slider:before {
 /* Responsive Breakpoints */
 @media (max-width: 1200px) {
   .dashboard-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     grid-template-areas: 
-      "center center"
-      "left right";
+      "center"
+      "left"
+      "right";
   }
   
   .center-area {
@@ -539,11 +581,19 @@ input:checked + .slider:before {
     grid-area: right;
     max-width: 100%;
   }
+
+  .pool-list-container {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
 }
 
 @media (max-width: 768px) {
-  .header-section h1 {
-    font-size: 1.7rem;
+  .app-container {
+    padding: 12px 12px 28px;
+  }
+
+  .promo-bar-track {
+    animation-duration: 14s;
   }
   
   .dashboard-grid {
@@ -565,4 +615,21 @@ input:checked + .slider:before {
   .sidebar-right {
     grid-area: right;
   }
+
+  .pool-list-container {
+    grid-template-columns: 1fr;
+  }
+
+  .wheel-centerpiece {
+    padding: 12px;
+  }
+
+  .wheel-spin-btn {
+    width: 78px;
+    height: 78px;
+  }
+}
+
+.result-empty-state {
+  min-height: 320px;
 }

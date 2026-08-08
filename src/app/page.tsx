@@ -173,6 +173,11 @@ export default function Home() {
   }, [handleResetFilters]);
 
   const allCharactersSelectedGone = selectedNames.size === 0;
+  const promoMessages = [
+    "jeumwoo was here!",
+    "ria sunget",
+    "durp enge welkin sige na",
+  ];
 
   return (
     <main style={{ minHeight: "100vh", position: "relative" }}>
@@ -200,12 +205,15 @@ export default function Home() {
 
       {/* DASHBOARD LAYOUT */}
       <div className="app-container">
-        {/* HEADER SECTION */}
-        <header className="header-section">
-          <h1>Genshin Spin Wheel</h1>
-          <p>Gacha character destiny picker & randomizer</p>
-          <div className="header-divider" />
-        </header>
+        <div className="promo-bar" aria-label="Promotional notification strip">
+          <div className="promo-bar-track">
+            {[...promoMessages, ...promoMessages].map((message, index) => (
+              <span key={`${message}-${index}`} className="promo-pill">
+                {message}
+              </span>
+            ))}
+          </div>
+        </div>
 
         {/* DASHBOARD GRID */}
         <div className="dashboard-grid">
@@ -233,7 +241,7 @@ export default function Home() {
           <section className="center-area">
             {allCharactersSelectedGone ? (
               /* ALL CHARACTERS SELECTED SCREEN */
-              <div className="glass-panel p-10 text-center flex flex-col items-center gap-6 max-w-md w-full animate-fade-in border-red-500/25">
+              <div className="glass-panel result-empty-state p-10 text-center flex flex-col items-center gap-6 max-w-md w-full animate-fade-in border-red-500/25">
                 <span className="text-4xl">🎉</span>
                 <h2 className="text-xl font-bold text-white uppercase tracking-wider">
                   All characters have been selected!

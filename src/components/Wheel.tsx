@@ -49,7 +49,7 @@ export default function Wheel({
       // Draw placeholder empty wheel
       ctx.beginPath();
       ctx.arc(center, center, radius, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(13, 13, 30, 0.6)";
+      ctx.fillStyle = "rgba(20, 26, 38, 0.78)";
       ctx.fill();
       ctx.lineWidth = 4;
       ctx.strokeStyle = "var(--border-gold-low)";
@@ -152,16 +152,16 @@ export default function Wheel({
     // Draw inner hub (glassmorphic golden circle)
     ctx.beginPath();
     ctx.arc(center, center, Math.min(45, radius * 0.25), 0, Math.PI * 2);
-    ctx.fillStyle = "var(--bg-panel-solid)";
+    ctx.fillStyle = "rgba(245, 234, 201, 0.08)";
     ctx.fill();
     ctx.lineWidth = 3;
-    ctx.strokeStyle = "var(--border-gold)";
+    ctx.strokeStyle = "rgba(255, 244, 205, 0.65)";
     ctx.stroke();
 
     // Draw metallic grid inside hub
     ctx.beginPath();
     ctx.arc(center, center, Math.min(40, radius * 0.22), 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillStyle = "rgba(255, 244, 205, 0.16)";
     ctx.fill();
   }, [activeCharacters]);
 
@@ -295,15 +295,15 @@ export default function Wheel({
           className="wheel-spin-btn"
         >
           <span 
-            className="text-[14px] font-extrabold uppercase tracking-widest text-gold"
+            className="text-[14px] font-extrabold uppercase tracking-widest text-[#20160a]"
             style={{
               fontFamily: "var(--font-header)",
-              textShadow: "0 2px 4px rgba(0,0,0,0.6)",
+              textShadow: "0 1px 0 rgba(255,255,255,0.18)",
             }}
           >
             Spin
           </span>
-          <span className="text-[9px] text-muted font-bold -mt-0.5">
+          <span className="text-[9px] text-[#3b2a12] font-bold -mt-0.5">
             {activeCharacters.length} Active
           </span>
         </button>
