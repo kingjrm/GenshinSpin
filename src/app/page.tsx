@@ -252,12 +252,21 @@ export default function Home() {
       {/* DASHBOARD LAYOUT */}
       <div className="app-container">
         <div className="promo-bar" aria-label="Promotional notification strip">
-          <div className="promo-bar-track">
-            {[...promoMessages, ...promoMessages].map((message, index) => (
-              <span key={`${message}-${index}`} className="promo-pill">
-                {message}
-              </span>
-            ))}
+          <div className="promo-bar-track" aria-hidden="true">
+            <div className="promo-group">
+              {promoMessages.map((message) => (
+                <span key={`promo-${message}`} className="promo-pill">
+                  {message}
+                </span>
+              ))}
+            </div>
+            <div className="promo-group" aria-hidden="true">
+              {promoMessages.map((message) => (
+                <span key={`promo-copy-${message}`} className="promo-pill">
+                  {message}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 

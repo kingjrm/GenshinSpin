@@ -25,11 +25,20 @@
   gap: 14px;
   width: max-content;
   padding: 10px 18px;
-  animation: promoScroll 18s linear infinite;
+  animation: promoScroll 20s linear infinite;
+  will-change: transform;
+  flex-wrap: nowrap;
 }
 
 .promo-bar:hover .promo-bar-track {
   animation-play-state: paused;
+}
+
+.promo-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
 }
 
 .promo-pill {
@@ -49,7 +58,13 @@
 
 @keyframes promoScroll {
   from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  to { transform: translateX(calc(-50% - 7px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-bar-track {
+    animation: none;
+  }
 }
 
 /* Introduction Gate Screen */
