@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { charactersData, Character } from "@/data/characters";
-import { worldBosses, weeklyBosses, bossesData, Boss, getBossImageUrl } from "@/data/bosses";
+import { worldBosses, weeklyBosses, localLegends, bossesData, Boss, getBossImageUrl, getRegionElement } from "@/data/bosses";
 import Wheel from "@/components/Wheel";
 import BossWheel from "@/components/BossWheel";
 import FilterPanel, { FilterState } from "@/components/FilterPanel";
@@ -33,7 +33,7 @@ export default function Home() {
   const [isSpinning, setIsSpinning] = useState(false);
 
   // Boss state variables
-  const [bossType, setBossType] = useState<"world" | "weekly" | "both" | null>(null);
+  const [bossType, setBossType] = useState<"world" | "weekly" | "local" | "all" | null>(null);
   const [selectedBoss, setSelectedBoss] = useState<Boss | null>(null);
   const [isBossSpinning, setIsBossSpinning] = useState(false);
   const [showBossResult, setShowBossResult] = useState(false);
@@ -42,7 +42,8 @@ export default function Home() {
   const activeBosses = useMemo(() => {
     if (bossType === "world") return worldBosses;
     if (bossType === "weekly") return weeklyBosses;
-    if (bossType === "both") return bossesData;
+    if (bossType === "local") return localLegends;
+    if (bossType === "all") return bossesData;
     return [];
   }, [bossType]);
 
@@ -411,8 +412,11 @@ export default function Home() {
                   <button onClick={() => setBossType("weekly")} className="boss-type-btn">
                     Weekly Boss
                   </button>
-                  <button onClick={() => setBossType("both")} className="boss-type-btn">
-                    Both
+                  <button onClick={() => setBossType("local")} className="boss-type-btn">
+                    Local Legends
+                  </button>
+                  <button onClick={() => setBossType("all")} className="boss-type-btn">
+                    All
                   </button>
                 </div>
               </div>
@@ -420,7 +424,7 @@ export default function Home() {
               <div className="boss-wheel-container">
                 <div className="boss-pool-info-bar">
                   <span className="boss-pool-label">
-                    Active Pool: {bossType === "world" ? "World Bosses" : bossType === "weekly" ? "Weekly Bosses" : "All Bosses"} ({activeBosses.length})
+                    Active Pool: {bossType === "world" ? "World Bosses" : bossType === "weekly" ? "Weekly Bosses" : bossType === "local" ? "Local Legends" : "All Bosses/Legends"} ({activeBosses.length})
                   </span>
                   <button onClick={() => setBossType(null)} className="boss-change-pool-btn">
                     Change Pool
@@ -471,7 +475,7 @@ export default function Home() {
                       <CharacterImage
                         name={selectedBoss.name}
                         src={getBossImageUrl(selectedBoss, "portrait")}
-                        element={selectedBoss.element}
+                        element={getRegionElement(selectedBoss.region)}
                         rarity={selectedBoss.category === "Weekly Boss" ? 5 : 4}
                         size={84}
                       />
@@ -480,6 +484,7 @@ export default function Home() {
                         <span className="matchup-boss-category" style={{
                           color: selectedBoss.category === "Weekly Boss" ? "var(--rarity-5)" : "var(--rarity-4)"
                         }}>{selectedBoss.category}</span>
+                        <span className="matchup-boss-region-badge">{selectedBoss.region}</span>
                       </div>
                     </div>
                   </div>

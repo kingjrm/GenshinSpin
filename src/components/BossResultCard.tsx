@@ -2,7 +2,7 @@
 
 import React from "react";
 import { createPortal } from "react-dom";
-import { Boss, getBossImageUrl } from "@/data/bosses";
+import { Boss, getBossImageUrl, getRegionElement } from "@/data/bosses";
 import CharacterImage from "./CharacterImage";
 
 interface BossResultCardProps {
@@ -16,18 +16,19 @@ export default function BossResultCard({
 }: BossResultCardProps) {
   if (!boss) return null;
 
-  const elementColors: Record<string, string> = {
-    Pyro: "var(--color-pyro)",
-    Hydro: "var(--color-hydro)",
-    Cryo: "var(--color-cryo)",
-    Electro: "var(--color-electro)",
-    Dendro: "var(--color-dendro)",
-    Anemo: "var(--color-anemo)",
-    Geo: "var(--color-geo)",
+  const regionColors: Record<string, string> = {
+    Mondstadt: "var(--color-anemo)", // Teal/Cyan
+    Liyue: "var(--color-geo)",       // Gold/Yellow
+    Inazuma: "var(--color-electro)", // Purple
+    Sumeru: "var(--color-dendro)",   // Green
+    Fontaine: "var(--color-hydro)",  // Blue
+    Natlan: "var(--color-pyro)",     // Red/Orange
+    Snezhnaya: "var(--color-cryo)",  // Cryo Light Blue
+    "Nod-Krai": "var(--color-none)", // Silver/Grey
     None: "var(--color-none)",
   };
 
-  const elementColor = elementColors[boss.element] || "var(--color-none)";
+  const themeColor = regionColors[boss.region] || "var(--color-none)";
   const rarity = boss.category === "Weekly Boss" ? 5 : 4;
 
   const renderStars = (starCount: number) => {
@@ -47,7 +48,7 @@ export default function BossResultCard({
       <div 
         className="result-glow"
         style={{
-          background: `radial-gradient(circle, ${elementColor} 0%, transparent 70%)`,
+          background: `radial-gradient(circle, ${themeColor} 0%, transparent 70%)`,
         }}
       />
 
@@ -55,7 +56,7 @@ export default function BossResultCard({
         className="result-card-container"
         style={{
           background: "radial-gradient(circle at center, rgba(28, 35, 52, 0.98) 0%, rgba(9, 12, 18, 0.98) 100%)",
-          boxShadow: `0 24px 70px rgba(0, 0, 0, 0.75), 0 0 30px ${elementColor}25, inset 0 0 25px rgba(255,255,255,0.05)`,
+          boxShadow: `0 24px 70px rgba(0, 0, 0, 0.75), 0 0 30px ${themeColor}25, inset 0 0 25px rgba(255,255,255,0.05)`,
         }}
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking card itself
       >
@@ -69,13 +70,13 @@ export default function BossResultCard({
         <div 
           className="result-portrait-wrap"
           style={{
-            boxShadow: `0 0 30px ${elementColor}40`,
+            boxShadow: `0 0 30px ${themeColor}40`,
           }}
         >
           <CharacterImage
             name={boss.name}
             src={getBossImageUrl(boss, "portrait")}
-            element={boss.element}
+            element={getRegionElement(boss.region)}
             rarity={rarity}
             size={140}
             priority={true}
@@ -93,13 +94,13 @@ export default function BossResultCard({
           <div className="result-tags">
             <span
               className="element-tag"
-              style={{ color: elementColor, borderColor: `${elementColor}40` }}
+              style={{ color: themeColor, borderColor: `${themeColor}40` }}
             >
               {boss.category}
             </span>
-            {boss.element !== "None" && (
+            {boss.region !== "None" && (
               <span className="element-tag text-gold/80 border-gold/10">
-                {boss.element}
+                {boss.region}
               </span>
             )}
           </div>

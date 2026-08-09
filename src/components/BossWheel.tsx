@@ -81,17 +81,18 @@ export default function BossWheel({
       if (N > 30) {
         ctx.fillStyle = i % 2 === 0 ? "#111026" : "#171633";
       } else {
-        const elementColors: Record<string, string> = {
-          Pyro: "rgba(255, 96, 64, 0.45)",
-          Hydro: "rgba(60, 212, 255, 0.45)",
-          Cryo: "rgba(156, 245, 255, 0.45)",
-          Electro: "rgba(226, 133, 255, 0.45)",
-          Dendro: "rgba(133, 235, 52, 0.45)",
-          Anemo: "rgba(85, 255, 212, 0.45)",
-          Geo: "rgba(255, 215, 94, 0.45)",
+        const regionColors: Record<string, string> = {
+          Mondstadt: "rgba(85, 255, 212, 0.45)", // Anemo
+          Liyue: "rgba(255, 215, 94, 0.45)",     // Geo
+          Inazuma: "rgba(226, 133, 255, 0.45)",   // Electro
+          Sumeru: "rgba(133, 235, 52, 0.45)",     // Dendro
+          Fontaine: "rgba(60, 212, 255, 0.45)",   // Hydro
+          Natlan: "rgba(255, 96, 64, 0.45)",       // Pyro
+          Snezhnaya: "rgba(156, 245, 255, 0.45)",  // Cryo
+          "Nod-Krai": "rgba(161, 163, 179, 0.45)", // Grey
           None: "rgba(161, 163, 179, 0.45)",
         };
-        ctx.fillStyle = elementColors[boss.element] || elementColors.None;
+        ctx.fillStyle = regionColors[boss.region] || regionColors.None;
       }
       ctx.fill();
 
@@ -110,17 +111,18 @@ export default function BossWheel({
         ctx.textAlign = "right";
         ctx.textBaseline = "middle";
         
-        const nameColors: Record<string, string> = {
-          Pyro: "#ff8c73",
-          Hydro: "#8cd9ff",
-          Cryo: "#d1f9ff",
-          Electro: "#f0b3ff",
-          Dendro: "#b3ff66",
-          Anemo: "#80ffd4",
-          Geo: "#ffe080",
+        const regionNameColors: Record<string, string> = {
+          Mondstadt: "#80ffd4", // Anemo
+          Liyue: "#ffe080",     // Geo
+          Inazuma: "#f0b3ff",   // Electro
+          Sumeru: "#b3ff66",     // Dendro
+          Fontaine: "#8cd9ff",   // Hydro
+          Natlan: "#ff8c73",     // Pyro
+          Snezhnaya: "#d1f9ff",  // Cryo
+          "Nod-Krai": "#d1d3e0", // Grey
           None: "#d1d3e0",
         };
-        ctx.fillStyle = nameColors[boss.element] || "#ffffff";
+        ctx.fillStyle = regionNameColors[boss.region] || "#ffffff";
         
         const fontSize = Math.max(9, Math.min(13, 280 / N));
         ctx.font = `bold ${fontSize}px var(--font-body)`;

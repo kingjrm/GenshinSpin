@@ -1121,6 +1121,7 @@ input:checked + .slider:before {
   gap: 12px;
   justify-content: center;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .boss-type-btn {
@@ -1453,5 +1454,20 @@ input:checked + .slider:before {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+.matchup-boss-region-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(216, 179, 106, 0.1);
+  color: var(--text-gold);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(216, 179, 106, 0.25);
+  margin-top: 4px;
+  display: inline-block;
+}
+
 
 
