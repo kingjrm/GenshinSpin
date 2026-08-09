@@ -225,6 +225,7 @@ export default function Home() {
 
   const allCharactersSelectedGone = selectedNames.size === 0;
   const promoMessages = [
+    "Ponkan 🍊 lopet beta tester",
     "jeumwoo was here!",
     "ria sunget",
     "durp enge welkin sige na",
