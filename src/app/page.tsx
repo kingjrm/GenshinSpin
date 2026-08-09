@@ -1,12 +1,17 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { charactersData, Character } from "@/data/characters";
+import { worldBosses, weeklyBosses, bossesData, Boss, getBossImageUrl } from "@/data/bosses";
 import Wheel from "@/components/Wheel";
+import BossWheel from "@/components/BossWheel";
 import FilterPanel, { FilterState } from "@/components/FilterPanel";
 import CharacterPool from "@/components/CharacterPool";
 import ResultCard from "@/components/ResultCard";
+import BossResultCard from "@/components/BossResultCard";
 import SpinHistory from "@/components/SpinHistory";
+import CharacterImage from "@/components/CharacterImage";
 import "./page.css";
 
 export default function Home() {
@@ -26,6 +31,24 @@ export default function Home() {
   const [history, setHistory] = useState<Character[]>([]);
   const [removeAfterSpin, setRemoveAfterSpin] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
+
+  // Boss state variables
+  const [bossType, setBossType] = useState<"world" | "weekly" | "both" | null>(null);
+  const [selectedBoss, setSelectedBoss] = useState<Boss | null>(null);
+  const [isBossSpinning, setIsBossSpinning] = useState(false);
+  const [showBossResult, setShowBossResult] = useState(false);
+  const [showBossBattleOverlay, setShowBossBattleOverlay] = useState(false);
+
+  const activeBosses = useMemo(() => {
+    if (bossType === "world") return worldBosses;
+    if (bossType === "weekly") return weeklyBosses;
+    if (bossType === "both") return bossesData;
+    return [];
+  }, [bossType]);
+
+  const teamCharacters = useMemo(() => {
+    return history.slice(0, 4);
+  }, [history]);
 
   // Automatic intro fade-out effect after 1.5 seconds
   React.useEffect(() => {
@@ -161,7 +184,13 @@ export default function Home() {
   const handleSpinComplete = useCallback(
     (character: Character) => {
       setResult(character);
-      setHistory((prev) => [character, ...prev]);
+      setHistory((prev) => {
+        const next = [character, ...prev];
+        if (next.length === 4) {
+          setShowBossBattleOverlay(true);
+        }
+        return next;
+      });
       if (removeAfterSpin) {
         handleRemoveCharacter(character.name);
       }
@@ -181,7 +210,18 @@ export default function Home() {
     setResult(null);
     setHistory([]);
     setRemoveAfterSpin(false);
+    // Reset boss states
+    setBossType(null);
+    setSelectedBoss(null);
+    setIsBossSpinning(false);
+    setShowBossResult(false);
+    setShowBossBattleOverlay(false);
   }, [handleResetFilters]);
+
+  const handleSpinAgainBoss = useCallback(() => {
+    setSelectedBoss(null);
+    setShowBossResult(false);
+  }, []);
 
   const allCharactersSelectedGone = selectedNames.size === 0;
   const promoMessages = [
@@ -293,6 +333,17 @@ export default function Home() {
                       Reset Wheel State
                     </button>
                   </div>
+
+                  {history.length >= 4 && !showBossBattleOverlay && (
+                    <div className="enter-boss-btn-container w-full">
+                      <button
+                        onClick={() => setShowBossBattleOverlay(true)}
+                        className="enter-boss-battle-btn w-full"
+                      >
+                        ⚔️ Enter Boss Battle ⚔️
+                      </button>
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -329,7 +380,124 @@ export default function Home() {
             <SpinHistory history={history} onClearHistory={handleClearHistory} />
           </aside>
         </div>
+
       </div>
+
+      {/* BOSS BATTLE OVERLAY */}
+      {showBossBattleOverlay && history.length >= 4 && typeof document !== "undefined" && createPortal(
+        <div className="boss-battle-overlay" onClick={() => setShowBossBattleOverlay(false)}>
+          <div className="boss-battle-section glass-panel" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowBossBattleOverlay(false)}
+              className="boss-overlay-close-btn"
+              aria-label="Close Boss Battle"
+            >
+              ✕
+            </button>
+
+            <div className="boss-battle-header-container">
+              <h2 className="boss-title-header">BOSS BATTLE</h2>
+              <div className="boss-divider" />
+            </div>
+
+            {bossType === null ? (
+              <div className="boss-setup">
+                <p className="boss-section-desc">Choose Boss Type</p>
+                <div className="boss-type-buttons">
+                  <button onClick={() => setBossType("world")} className="boss-type-btn">
+                    World Boss
+                  </button>
+                  <button onClick={() => setBossType("weekly")} className="boss-type-btn">
+                    Weekly Boss
+                  </button>
+                  <button onClick={() => setBossType("both")} className="boss-type-btn">
+                    Both
+                  </button>
+                </div>
+              </div>
+            ) : selectedBoss === null ? (
+              <div className="boss-wheel-container">
+                <div className="boss-pool-info-bar">
+                  <span className="boss-pool-label">
+                    Active Pool: {bossType === "world" ? "World Bosses" : bossType === "weekly" ? "Weekly Bosses" : "All Bosses"} ({activeBosses.length})
+                  </span>
+                  <button onClick={() => setBossType(null)} className="boss-change-pool-btn">
+                    Change Pool
+                  </button>
+                </div>
+
+                <BossWheel
+                  activeBosses={activeBosses}
+                  onSpinComplete={(boss) => {
+                    setSelectedBoss(boss);
+                    setShowBossResult(true);
+                  }}
+                  isSpinning={isBossSpinning}
+                  setIsSpinning={setIsBossSpinning}
+                />
+              </div>
+            ) : (
+              <div className="boss-matchup-container">
+                <div className="matchup-grid">
+                  {/* TEAM */}
+                  <div className="matchup-team-card glass-panel-inner">
+                    <h3 className="matchup-card-title">YOUR TEAM</h3>
+                    <div className="matchup-team-portraits">
+                      {teamCharacters.map((char) => (
+                        <div key={char.name} className="matchup-portrait-item">
+                          <CharacterImage
+                            name={char.name}
+                            src={char.image}
+                            element={char.element}
+                            rarity={char.rarity}
+                            size={76}
+                          />
+                          <span className="matchup-portrait-name">{char.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* VS */}
+                  <div className="matchup-vs">
+                    <span className="matchup-vs-text">VS</span>
+                  </div>
+
+                  {/* BOSS */}
+                  <div className="matchup-boss-card glass-panel-inner">
+                    <h3 className="matchup-card-title">BOSS</h3>
+                    <div className="matchup-boss-content">
+                      <CharacterImage
+                        name={selectedBoss.name}
+                        src={getBossImageUrl(selectedBoss, "portrait")}
+                        element={selectedBoss.element}
+                        rarity={selectedBoss.category === "Weekly Boss" ? 5 : 4}
+                        size={84}
+                      />
+                      <div className="matchup-boss-info">
+                        <span className="matchup-boss-name">{selectedBoss.name}</span>
+                        <span className="matchup-boss-category" style={{
+                          color: selectedBoss.category === "Weekly Boss" ? "var(--rarity-5)" : "var(--rarity-4)"
+                        }}>{selectedBoss.category}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="matchup-actions">
+                  <button onClick={handleSpinAgainBoss} className="boss-action-btn spin-again-btn">
+                    SPIN AGAIN
+                  </button>
+                  <button onClick={handleResetWheel} className="boss-action-btn new-team-btn">
+                    NEW TEAM
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* GACHA WISH REVEAL CARD OVERLAY */}
       {result && (
@@ -338,6 +506,14 @@ export default function Home() {
           onClose={() => setResult(null)}
           onRemoveCharacter={handleRemoveCharacter}
           removeAfterSpinEnabled={removeAfterSpin}
+        />
+      )}
+
+      {/* BOSS WISH REVEAL CARD OVERLAY */}
+      {showBossResult && selectedBoss && (
+        <BossResultCard
+          boss={selectedBoss}
+          onClose={() => setShowBossResult(false)}
         />
       )}
     </main>
