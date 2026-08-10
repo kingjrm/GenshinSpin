@@ -233,7 +233,7 @@ export default function Home() {
     "durp enge welkin sige na",
     "UY PILIPINSS!!!!!",
     "VOTE WISELY",
-    "Shawawt Mga Poging Beta Testers: Arquii, Justin Lim",
+    "Shawawt Mga Beta Testers: Arquii, Justin Lim",
     "Wishing u luck on 50/50",
     "Snezhnaya na wahhhhh",
   ];
