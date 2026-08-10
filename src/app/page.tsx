@@ -226,12 +226,14 @@ export default function Home() {
 
   const allCharactersSelectedGone = selectedNames.size === 0;
   const promoMessages = [
+    "Kiwich dabest",
     "Ponkan 🍊 lopet beta tester",
     "jeumwoo was here!",
     "ria sunget",
     "durp enge welkin sige na",
     "UY PILIPINSS!!!!!",
     "VOTE WISELY",
+    "Shawawt Mga Poging Beta Testers: Arquii, Justin Lim",
     "Wishing u luck on 50/50",
     "Snezhnaya na wahhhhh",
   ];
