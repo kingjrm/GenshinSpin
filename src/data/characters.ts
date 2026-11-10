@@ -128,6 +128,12 @@ const ENKA_ICON_MAP: Record<string, string> = {
   "Yun Jin": "Yunjin",
   "Zhongli": "Zhongli",
   "Zibai": "Zibai",
+  "Odette": "Odette",
+  "Alyosha": "Alyosha",
+  "Vesna": "Vesna",
+  "Vodyanitsa": "Vodyanitsa",
+  "Mitya": "Mitya",
+  "Valeriy": "Valeriy",
 };
 
 // Centralized image mapping function using Enka.Network CDN
@@ -260,5 +266,10 @@ export const charactersData: Character[] = [
   { name: "Yumemizuki Mizuki", rarity: 5, element: "Anemo", weapon: "Catalyst", region: "Inazuma", image: getCharacterIconUrl("Yumemizuki Mizuki") },
   { name: "Yun Jin", rarity: 4, element: "Geo", weapon: "Polearm", region: "Liyue", image: getCharacterIconUrl("Yun Jin") },
   { name: "Zhongli", rarity: 5, element: "Geo", weapon: "Polearm", region: "Liyue", image: getCharacterIconUrl("Zhongli") },
-  { name: "Zibai", rarity: 4, element: "Geo", weapon: "Sword", region: "Nod-Krai", image: getCharacterIconUrl("Zibai") }
-];
+  { name: "Zibai", rarity: 4, element: "Geo", weapon: "Sword", region: "Nod-Krai", image: getCharacterIconUrl("Zibai") },
+  { name: "Odette", rarity: 5, element: "Cryo", weapon: "Sword", region: "Snezhnaya", image: getCharacterIconUrl("Odette") },
+  { name: "Alyosha", rarity: 4, element: "Electro", weapon: "Polearm", region: "Snezhnaya", image: getCharacterIconUrl("Alyosha") },
+  { name: "Vesna", rarity: 5, element: "Anemo", weapon: "Sword", region: "Snezhnaya", image: getCharacterIconUrl("Vesna") },
+  { name: "Vodyanitsa", rarity: 5, element: "Hydro", weapon: "Catalyst", region: "Snezhnaya", image: getCharacterIconUrl("Vodyanitsa") },
+  { name: "Mitya", rarity: 5, element: "Electro", weapon: "Catalyst", region: "Snezhnaya", image: getCharacterIconUrl("Mitya") },
+  { name: "Valeriy", rarity: 4, element: "Electro", weapon: "Sword", region: "Snezhnaya", image: getCharacterIconUrl("Valeriy") }];

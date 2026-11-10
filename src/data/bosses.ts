@@ -51,8 +51,8 @@ export const worldBosses: Boss[] = [
   { name: "Super-Heavy Landrover: Mechanized Fortress", category: "World Boss", region: "Natlan", wikiFilename: "Enemy_Super-Heavy_Landrover_Mechanized_Fortress.png" },
   { name: "Lord of the Hidden Depths - Whisperer of Nightmares", category: "World Boss", region: "Natlan", wikiFilename: "Enemy_Lord_of_the_Hidden_Depths_-_Whisperer_of_Nightmares.png" },
   { name: "Radiant Moongecko", category: "World Boss", region: "Natlan", wikiFilename: "Enemy_Radiant_Moongecko.png" },
-  { name: "Chimeric Winged Lion", category: "World Boss", region: "Natlan", wikiFilename: "Enemy_Chimeric_Winged_Lion.png" },
-  { name: "Immortal Construct", category: "World Boss", region: "Natlan", wikiFilename: "Enemy_Immortal_Construct.png" }
+  { name: "Chimeric Winged Lion", category: "World Boss", region: "Snezhnaya", wikiFilename: "Enemy_Chimeric_Winged_Lion.png" },
+  { name: "Immortal Construct", category: "World Boss", region: "Snezhnaya", wikiFilename: "Enemy_Immortal_Construct.png" }
 ];
 
 export const weeklyBosses: Boss[] = [
@@ -69,7 +69,8 @@ export const weeklyBosses: Boss[] = [
   { name: "Lord of Eroded Primal Fire", category: "Weekly Boss", region: "Natlan", wikiFilename: "Enemy_Lord_of_Eroded_Primal_Fire.png" },
   { name: "The Game Before the Gate", category: "Weekly Boss", region: "Nod-Krai", wikiFilename: "Enemy_The_Game_Before_the_Gate.png" },
   { name: "The Doctor - Dottore", category: "Weekly Boss", region: "Nod-Krai", wikiFilename: "Enemy_The_Doctor_-_Dottore.png" },
-  { name: "Exalted Master of the Heretical Path", category: "Weekly Boss", region: "Nod-Krai", wikiFilename: "Enemy_Exalted_Master_of_the_Heretical_Path.png" }
+  { name: "Exalted Master of the Heretical Path", category: "Weekly Boss", region: "Nod-Krai", wikiFilename: "Enemy_Exalted_Master_of_the_Heretical_Path.png" },
+  { name: "Puppet Controlling RONOVA", category: "Weekly Boss", region: "Snezhnaya", wikiFilename: "Enemy_Puppet_Controlling_Ronova.png" }
 ];
 
 export const localLegends: Boss[] = [
@@ -119,7 +120,14 @@ export const localLegends: Boss[] = [
   { name: "Rocky Avildsen", category: "Local Legend", region: "Fontaine" },
   { name: "Deianeira of Snezhevna", category: "Local Legend", region: "Fontaine" },
   { name: "Cineas", category: "Local Legend", region: "Fontaine" },
-  { name: "Ruler of the Chizhang Mountains", category: "Local Legend", region: "Liyue" }
+  { name: "Ruler of the Chizhang Mountains", category: "Local Legend", region: "Liyue" },
+  // Snezhnaya Local Legends
+  { name: "Churin", category: "Local Legend", region: "Snezhnaya" },
+  { name: "Banje", category: "Local Legend", region: "Snezhnaya" },
+  { name: "Furiosa", category: "Local Legend", region: "Snezhnaya" },
+  { name: "Elder Blighttree", category: "Local Legend", region: "Snezhnaya" },
+  { name: "Ancient Ironquill", category: "Local Legend", region: "Snezhnaya" },
+  { name: "Rowdy Beast Host", category: "Local Legend", region: "Snezhnaya" }
 ];
 
 export const bossesData: Boss[] = [...worldBosses, ...weeklyBosses, ...localLegends];
@@ -141,6 +149,7 @@ export function getRegionElement(region: string): "Anemo" | "Geo" | "Electro" | 
     case "Fontaine": return "Hydro";
     case "Natlan": return "Pyro";
     case "Snezhnaya": return "Cryo";
+    case "Nod-Krai": return "Cryo";
     default: return "None";
   }
 }
