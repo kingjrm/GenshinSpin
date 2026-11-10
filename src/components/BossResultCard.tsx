@@ -2,8 +2,8 @@
 
 import React from "react";
 import { createPortal } from "react-dom";
-import { Boss, getBossImageUrl, getRegionElement } from "@/data/bosses";
-import CharacterImage from "./CharacterImage";
+import { Boss, getRegionElement } from "@/data/bosses";
+import BossImage from "./BossImage";
 
 interface BossResultCardProps {
   boss: Boss | null;
@@ -73,13 +73,10 @@ export default function BossResultCard({
             boxShadow: `0 0 30px ${themeColor}40`,
           }}
         >
-          <CharacterImage
-            name={boss.name}
-            src={getBossImageUrl(boss, "portrait")}
-            element={getRegionElement(boss.region)}
-            rarity={rarity}
-            size={140}
-            priority={true}
+          <BossImage
+            boss={boss}
+            size={160}
+            shape="rect"
           />
         </div>
 
