@@ -75,7 +75,7 @@ export default function FilterPanel({
         <span className="filter-search-icon" style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>&#9906;</span>
         <input
           type="text"
-          placeholder="Search characters..."
+          placeholder="   Search characters..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="filter-search-input"
