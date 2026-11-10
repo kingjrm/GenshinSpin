@@ -28,6 +28,12 @@ const RARITY_BORDER: Record<number, string> = {
   4: "#a256e3",
 };
 
+// Fallback CDN chain: enka.network → gi.yatta.moe → initials
+function getYattaFallback(name: string): string {
+  const key = name.replace(/\s+/g, "");
+  return `https://gi.yatta.moe/assets/UI/UI_AvatarIcon_${key}.png`;
+}
+
 export default function CharacterImage({
   name,
   src,
@@ -36,7 +42,18 @@ export default function CharacterImage({
   className = "",
   size = 80,
 }: CharacterImageProps) {
+  const [triedFallback, setTriedFallback] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState(src);
+
+  // Reset when src prop changes (e.g. different character)
+  const prevSrc = React.useRef(src);
+  if (prevSrc.current !== src) {
+    prevSrc.current = src;
+    setTriedFallback(false);
+    setFailed(false);
+    setCurrentSrc(src);
+  }
 
   const gradient = ELEMENT_GRADIENTS[element] || ELEMENT_GRADIENTS.None;
   const border   = RARITY_BORDER[rarity] ?? "#7c7f8a";
@@ -62,7 +79,7 @@ export default function CharacterImage({
     boxShadow: `0 0 10px ${border}55, 0 4px 12px rgba(0,0,0,0.5)`,
   };
 
-  if (!src || failed) {
+  if (!currentSrc || failed) {
     return (
       <div
         className={`select-none ${className}`}
@@ -87,12 +104,19 @@ export default function CharacterImage({
     <div className={className} style={{ ...baseStyle, background: "rgba(10,10,20,0.6)" }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={src}
+        src={currentSrc}
         alt={name}
         width={size}
         height={size}
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-        onError={() => setFailed(true)}
+        onError={() => {
+          if (!triedFallback) {
+            setTriedFallback(true);
+            setCurrentSrc(getYattaFallback(name));
+          } else {
+            setFailed(true);
+          }
+        }}
         loading="lazy"
         crossOrigin="anonymous"
       />

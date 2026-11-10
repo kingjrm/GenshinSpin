@@ -7,24 +7,139 @@ export interface Character {
   image: string;
 }
 
-// Convert a name to the genshin.jmp.blue ID standard (e.g. "Raiden Shogun" -> "raiden-shogun")
-export const getCharacterId = (name: string): string => {
-  const overrides: Record<string, string> = {
-    "Aloy": "aloy",
-    "Arlecchino": "arlecchino",
-    "Chasca": "chasca",
-    "Citlali": "citlali",
-    "Mavuika": "mavuika",
-    "Traveler": "traveler-anemo", // fallback standard
-  };
-  if (overrides[name]) return overrides[name];
-  return name.toLowerCase().replace(/ /g, "-");
+// Map display name → Enka internal UI icon name (without UI_AvatarIcon_ prefix and .png)
+// Enka CDN: https://enka.network/ui/UI_AvatarIcon_{key}.png
+const ENKA_ICON_MAP: Record<string, string> = {
+  "Aino": "Aino",
+  "Albedo": "Albedo",
+  "Alhaitham": "Alhatham",
+  "Aloy": "Aloy",
+  "Amber": "Ambor",
+  "Arataki Itto": "Itto",
+  "Arlecchino": "Arlecchino",
+  "Baizhu": "Baizhuer",
+  "Barbara": "Barbara",
+  "Beidou": "Beidou",
+  "Bennett": "Bennett",
+  "Candace": "Candace",
+  "Charlotte": "Charlotte",
+  "Chasca": "Chasca",
+  "Chevreuse": "Chevreuse",
+  "Chiori": "Chiori",
+  "Chongyun": "Chongyun",
+  "Citlali": "Citlali",
+  "Clorinde": "Clorinde",
+  "Collei": "Collei",
+  "Columbina": "Columbina",
+  "Cyno": "Cyno",
+  "Dahlia": "Dahlia",
+  "Dehya": "Dehya",
+  "Diluc": "Diluc",
+  "Diona": "Diona",
+  "Dori": "Dori",
+  "Durin": "Durin",
+  "Emilie": "Emilie",
+  "Escoffier": "Escoffier",
+  "Eula": "Eula",
+  "Faruzan": "Faruzan",
+  "Fischl": "Fischl",
+  "Flins": "Flins",
+  "Freminet": "Freminet",
+  "Furina": "Furina",
+  "Gaming": "Gaming",
+  "Ganyu": "Ganyu",
+  "Gorou": "Gorou",
+  "Hu Tao": "Hutao",
+  "Iansan": "Iansan",
+  "Ifa": "Ifa",
+  "Illuga": "Illuga",
+  "Ineffa": "Ineffa",
+  "Jahoda": "Jahoda",
+  "Jean": "Qin",
+  "Kachina": "Kachina",
+  "Kaedehara Kazuha": "Kazuha",
+  "Kaeya": "Kaeya",
+  "Kamisato Ayaka": "Ayaka",
+  "Kamisato Ayato": "Ayato",
+  "Kaveh": "Kaveh",
+  "Keqing": "Keqing",
+  "Kinich": "Kinich",
+  "Kirara": "Momoka",
+  "Klee": "Klee",
+  "Kujou Sara": "Sara",
+  "Kuki Shinobu": "Shinobu",
+  "Lan Yan": "Lanyan",
+  "Lauma": "Lauma",
+  "Layla": "Layla",
+  "Linnea": "Linnea",
+  "Lisa": "Lisa",
+  "Lohen": "Lohen",
+  "Lynette": "Lynette",
+  "Lyney": "Lyney",
+  "Mavuika": "Mavuika",
+  "Mika": "Mika",
+  "Mona": "Mona",
+  "Mualani": "Mualani",
+  "Nahida": "Nahida",
+  "Navia": "Navia",
+  "Nefer": "Nefer",
+  "Neuvillette": "Neuvillette",
+  "Nicole": "Nicole",
+  "Nilou": "Nilou",
+  "Ningguang": "Ningguang",
+  "Noelle": "Noel",
+  "Ororon": "Ororon",
+  "Prune": "Prune",
+  "Qiqi": "Qiqi",
+  "Raiden Shogun": "Shogun",
+  "Razor": "Razor",
+  "Rosaria": "Rosaria",
+  "Sandrone": "Sandrone",
+  "Sangonomiya Kokomi": "Kokomi",
+  "Sayu": "Sayu",
+  "Sethos": "Sethos",
+  "Shenhe": "Shenhe",
+  "Shikanoin Heizou": "Heizo",
+  "Sigewinne": "Sigewinne",
+  "Skirk": "Skirk",
+  "Sucrose": "Sucrose",
+  "Tartaglia": "Tartaglia",
+  "Thoma": "Tohma",
+  "Tighnari": "Tighnari",
+  "Traveler": "PlayerBoy", // fallback; could also be PlayerGirl
+  "Varesa": "Varesa",
+  "Varka": "Varka",
+  "Venti": "Venti",
+  "Wanderer": "Wanderer",
+  "Wonderland Manekin": "Manekin",
+  "Wriothesley": "Wriothesley",
+  "Xiangling": "Xiangling",
+  "Xianyun": "Liuyun",
+  "Xiao": "Xiao",
+  "Xilonen": "Xilonen",
+  "Xingqiu": "Xingqiu",
+  "Xinyan": "Xinyan",
+  "Yae Miko": "Yae",
+  "Yanfei": "Feiyan",
+  "Yaoyao": "Yaoyao",
+  "Yelan": "Yelan",
+  "Yoimiya": "Yoimiya",
+  "Yumemizuki Mizuki": "Mizuki",
+  "Yun Jin": "Yunjin",
+  "Zhongli": "Zhongli",
+  "Zibai": "Zibai",
 };
 
-// Centralized image mapping function
+// Centralized image mapping function using Enka.Network CDN
+// Falls back to gi.yatta.moe as secondary CDN if Enka fails (handled in CharacterImage component)
 export const getCharacterIconUrl = (name: string): string => {
-  const id = getCharacterId(name);
-  return `https://genshin.jmp.blue/characters/${id}/icon`;
+  const key = ENKA_ICON_MAP[name];
+  if (key) {
+    return `https://enka.network/ui/UI_AvatarIcon_${key}.png`;
+  }
+  // Fallback: try yatta.moe with PascalCase
+  const fallback = name.replace(/\s+/g, "");
+  return `https://gi.yatta.moe/assets/UI/UI_AvatarIcon_${fallback}.png`;
 };
 
 export const charactersData: Character[] = [

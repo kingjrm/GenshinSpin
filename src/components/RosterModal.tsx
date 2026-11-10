@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { Character, charactersData } from "@/data/characters";
+import { charactersData } from "@/data/characters";
 import CharacterImage from "./CharacterImage";
 
 interface RosterModalProps {
@@ -24,14 +24,10 @@ const ELEMENT_COLORS: Record<string, string> = {
   Pyro: "#ff6040",
   Cryo: "#9cf5ff",
 };
-const ELEMENT_ICONS: Record<string, string> = {
-  Anemo: "🌪️",
-  Geo: "⛰️",
-  Electro: "⚡",
-  Dendro: "🌿",
-  Hydro: "💧",
-  Pyro: "🔥",
-  Cryo: "❄️",
+
+const RARITY_COLORS: Record<number, string> = {
+  5: "#e0982c",
+  4: "#a256e3",
 };
 
 export default function RosterModal({
@@ -59,132 +55,157 @@ export default function RosterModal({
 
   const content = (
     <div
-      className="roster-modal-backdrop"
+      className="rm-backdrop"
       onClick={onClose}
     >
       <div
-        className="roster-modal-panel"
+        className="rm-panel"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="roster-modal-header">
-          <div>
-            <h2 className="roster-modal-title">Manage Roster</h2>
-            <p className="roster-modal-subtitle">
-              {selectedCount} of {charactersData.length} characters active
+        {/* ── HEADER ── */}
+        <div className="rm-header">
+          <div className="rm-header-info">
+            <h2 className="rm-title">Manage Roster</h2>
+            <p className="rm-subtitle">
+              <span className="rm-count-badge">{selectedCount}</span>
+              &nbsp;of {charactersData.length} characters in pool
             </p>
           </div>
-          <button onClick={onClose} className="roster-close-btn" aria-label="Close">✕</button>
+          <button onClick={onClose} className="rm-close-btn" aria-label="Close">
+            ✕
+          </button>
         </div>
 
-        {/* Controls */}
-        <div className="roster-controls">
+        {/* ── CONTROLS ── */}
+        <div className="rm-controls">
           {/* Search */}
-          <div className="roster-search-wrap">
-            <span className="roster-search-icon">🔍</span>
+          <div className="rm-search-wrap">
+            <span className="rm-search-icon">🔍</span>
             <input
               type="text"
-              placeholder="Search characters..."
+              placeholder="Search characters…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="roster-search-input"
+              className="rm-search-input"
+              autoFocus
             />
             {search && (
-              <button onClick={() => setSearch("")} className="roster-search-clear">✕</button>
+              <button onClick={() => setSearch("")} className="rm-search-clear">✕</button>
             )}
           </div>
 
-          {/* Rarity pills */}
-          <div className="roster-pill-row">
-            {(["all", "5", "4"] as const).map((r) => (
-              <button
-                key={r}
-                onClick={() => setRarityFilter(r)}
-                className={`roster-pill ${rarityFilter === r ? "active-gold" : ""}`}
-              >
-                {r === "all" ? "All ★" : r === "5" ? "5★" : "4★"}
-              </button>
-            ))}
-          </div>
+          {/* Filter row: rarity + element */}
+          <div className="rm-filter-row">
+            {/* Rarity */}
+            <div className="rm-pill-group">
+              {(["all", "5", "4"] as const).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setRarityFilter(r)}
+                  className={`rm-pill ${rarityFilter === r ? "rm-pill-active" : ""}`}
+                  style={rarityFilter === r && r !== "all" ? {
+                    background: `${RARITY_COLORS[parseInt(r)]}22`,
+                    borderColor: RARITY_COLORS[parseInt(r)],
+                    color: RARITY_COLORS[parseInt(r)],
+                  } : {}}
+                >
+                  {r === "all" ? "All ★" : `${r}★`}
+                </button>
+              ))}
+            </div>
 
-          {/* Element pills */}
-          <div className="roster-element-row">
-            {ELEMENTS.map((el) => (
-              <button
-                key={el}
-                onClick={() => setElementFilter(el)}
-                className={`roster-element-pill ${elementFilter === el ? "active" : ""}`}
-                style={
-                  elementFilter === el && el !== "All"
-                    ? { background: ELEMENT_COLORS[el] + "33", borderColor: ELEMENT_COLORS[el], color: ELEMENT_COLORS[el] }
-                    : {}
-                }
-              >
-                {el !== "All" ? ELEMENT_ICONS[el] : ""} {el}
-              </button>
-            ))}
+            <div className="rm-divider" />
+
+            {/* Elements */}
+            <div className="rm-pill-group rm-pill-group-wrap">
+              {ELEMENTS.map((el) => (
+                <button
+                  key={el}
+                  onClick={() => setElementFilter(el)}
+                  className={`rm-pill ${elementFilter === el ? "rm-pill-active" : ""}`}
+                  style={elementFilter === el && el !== "All" ? {
+                    background: `${ELEMENT_COLORS[el]}22`,
+                    borderColor: ELEMENT_COLORS[el],
+                    color: ELEMENT_COLORS[el],
+                  } : {}}
+                >
+                  {el}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Action buttons */}
-          <div className="roster-action-row">
-            <button onClick={() => onSelectVisible(filtered.map(c => c.name))} className="roster-action-btn gold">
-              ✓ Select All Visible ({filtered.length})
+          <div className="rm-action-row">
+            <button
+              onClick={() => onSelectVisible(filtered.map(c => c.name))}
+              className="rm-action-btn rm-btn-gold"
+            >
+              ✓ Select All ({filtered.length})
             </button>
-            <button onClick={() => onDeselectVisible(filtered.map(c => c.name))} className="roster-action-btn">
-              ✕ Deselect All Visible
+            <button
+              onClick={() => onDeselectVisible(filtered.map(c => c.name))}
+              className="rm-action-btn"
+            >
+              ✕ Deselect All
             </button>
-            <button onClick={onResetPool} className="roster-action-btn red">
+            <button onClick={onResetPool} className="rm-action-btn rm-btn-red">
               ↺ Reset to Default
             </button>
           </div>
         </div>
 
-        {/* Grid */}
-        <div className="roster-grid">
+        {/* ── GRID ── */}
+        <div className="rm-grid">
           {filtered.length === 0 ? (
-            <div className="roster-empty">
-              <span>🔍</span>
+            <div className="rm-empty">
+              <span style={{ fontSize: "2rem" }}>🔍</span>
               <p>No characters match your filters.</p>
             </div>
           ) : (
             filtered.map((char) => {
               const isActive = selectedNames.has(char.name);
+              const elColor = ELEMENT_COLORS[char.element] ?? "#aaa";
+              const rarColor = RARITY_COLORS[char.rarity] ?? "#7c7f8a";
+
               return (
                 <button
                   key={char.name}
                   onClick={() => onToggleCharacter(char.name)}
-                  className={`roster-card ${isActive ? "roster-card-active" : "roster-card-inactive"}`}
-                  title={`${char.name} — ${isActive ? "Click to remove" : "Click to add"}`}
+                  className={`rm-card ${isActive ? "rm-card-on" : "rm-card-off"}`}
+                  title={`${char.name} — ${isActive ? "click to remove" : "click to add"}`}
+                  style={{
+                    "--el-color": elColor,
+                    "--rar-color": rarColor,
+                  } as React.CSSProperties}
                 >
-                  {/* Deselected overlay */}
-                  {!isActive && (
-                    <div className="roster-card-dim" />
-                  )}
-                  {/* Remove X badge */}
-                  {isActive && (
-                    <span className="roster-card-badge active-badge">✓</span>
-                  )}
-                  {!isActive && (
-                    <span className="roster-card-badge inactive-badge">✕</span>
-                  )}
+                  {/* Rarity bar at top */}
+                  <div className="rm-card-rarity-bar" style={{ background: rarColor }} />
 
-                  <CharacterImage
-                    name={char.name}
-                    src={char.image}
-                    element={char.element}
-                    rarity={char.rarity}
-                    size={56}
-                  />
-                  <span className="roster-card-name">{char.name}</span>
-                  <span
-                    className="roster-card-element"
-                    style={{ color: ELEMENT_COLORS[char.element] || "#aaa" }}
-                  >
-                    {char.element !== "None" ? char.element : ""}
-                  </span>
-                  <span className="roster-card-rarity" style={{ color: char.rarity === 5 ? "var(--rarity-5)" : "var(--rarity-4)" }}>
-                    {"★".repeat(char.rarity)}
-                  </span>
+                  {/* Portrait */}
+                  <div className="rm-card-portrait-wrap">
+                    <CharacterImage
+                      name={char.name}
+                      src={char.image}
+                      element={char.element}
+                      rarity={char.rarity}
+                      size={72}
+                    />
+                    {/* Inactive overlay */}
+                    {!isActive && <div className="rm-card-off-overlay" />}
+                    {/* Status badge */}
+                    <span className={`rm-card-status ${isActive ? "rm-status-on" : "rm-status-off"}`}>
+                      {isActive ? "✓" : "✕"}
+                    </span>
+                  </div>
+
+                  {/* Info */}
+                  <div className="rm-card-info">
+                    <span className="rm-card-name">{char.name}</span>
+                    <span className="rm-card-el" style={{ color: elColor }}>
+                      {char.element !== "None" ? char.element : ""}
+                    </span>
+                  </div>
                 </button>
               );
             })
