@@ -1,5 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Noto+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
+/* HYWenHei-85W — Genshin Impact's native font.
+   Drop HYWenHei-85W.woff2 into /public/fonts/ to activate.
+   Also tries the community CDN mirror as a best-effort fallback. */
+@font-face {
+  font-family: 'HYWenHei-85W';
+  src: url('/fonts/HYWenHei-85W.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/cawa-93/HYWenHei-Extended-Font@main/HYWenHei-85W.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'HYWenHei';
+  src: url('/fonts/HYWenHei.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Colors */
   --bg-primary: #06070c;
@@ -29,8 +48,8 @@
   --rarity-none: #7c7f8a;
 
   /* Fonts */
-  --font-header: 'Cinzel', 'Cinzel Decorative', serif;
-  --font-body: 'IM Fell English', 'Noto Serif', serif;
+  --font-header: 'HYWenHei-85W', 'HYWenHei', 'Cinzel', 'Cinzel Decorative', serif;
+  --font-body: 'HYWenHei-85W', 'HYWenHei', 'IM Fell English', 'Noto Serif', serif;
   
   /* Borders and Blurs */
   --glass-blur: blur(14px);

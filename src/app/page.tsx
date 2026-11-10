@@ -13,6 +13,8 @@ import ResultCard from "@/components/ResultCard";
 import BossResultCard from "@/components/BossResultCard";
 import SpinHistory from "@/components/SpinHistory";
 import CharacterImage from "@/components/CharacterImage";
+import BackgroundCustomizer from "@/components/BackgroundCustomizer";
+import BossTimer from "@/components/BossTimer";
 import "./page.css";
 
 export default function Home() {
@@ -42,6 +44,10 @@ export default function Home() {
   const [showBossResult, setShowBossResult] = useState(false);
   const [showBossBattleOverlay, setShowBossBattleOverlay] = useState(false);
 
+  // Optional boss rules
+  const [bossTimeLimit, setBossTimeLimit] = useState<number | null>(null);
+  const [weaponReq, setWeaponReq] = useState<"any" | "4star" | "5star">("any");
+
   const activeBosses = useMemo(() => {
     if (bossType === "world") return worldBosses;
     if (bossType === "weekly") return weeklyBosses;
@@ -53,6 +59,21 @@ export default function Home() {
   const teamCharacters = useMemo(() => {
     return history.slice(0, teamSize);
   }, [history, teamSize]);
+
+  // Helper: randomly pick weapon req and time limit
+  const pickRules = React.useCallback(() => {
+    const weapons = ["any", "4star", "5star"] as const;
+    const times = [60, 120, 180, 300] as const;
+    setWeaponReq(weapons[Math.floor(Math.random() * weapons.length)]);
+    setBossTimeLimit(times[Math.floor(Math.random() * times.length)]);
+  }, []);
+
+  // Auto-pick rules whenever a boss is selected
+  React.useEffect(() => {
+    if (selectedBoss !== null) {
+      pickRules();
+    }
+  }, [selectedBoss, pickRules]);
 
   // Automatic intro fade-out effect after 1.5 seconds
   React.useEffect(() => {
@@ -195,6 +216,8 @@ export default function Home() {
     setIsBossSpinning(false);
     setShowBossResult(false);
     setShowBossBattleOverlay(false);
+    setBossTimeLimit(null);
+    setWeaponReq("any");
   }, [handleResetFilters]);
 
   const handleSpinAgainBoss = useCallback(() => {
@@ -217,6 +240,7 @@ export default function Home() {
 
   return (
     <main style={{ minHeight: "100vh", position: "relative" }}>
+      <BackgroundCustomizer />
       {/* IMMERSIVE GACHA GATE INTRO */}
       {showIntro && (
         <div className={`intro-gate-container ${fadeIntro ? "fade-out" : ""}`}>
@@ -509,6 +533,47 @@ export default function Home() {
               </div>
             ) : (
               <div className="boss-matchup-container">
+                {/* Auto-picked rules display */}
+                <div className="boss-rules-row">
+                  <div className="boss-rule-display">
+                    <span className="boss-rule-display-label">&#9876; Weapon</span>
+                    <span
+                      className="boss-rule-display-val"
+                      style={{
+                        color: weaponReq === "5star" ? "var(--rarity-5)"
+                          : weaponReq === "4star" ? "var(--rarity-4)"
+                          : "var(--text-muted)",
+                        borderColor: weaponReq === "5star" ? "var(--rarity-5)"
+                          : weaponReq === "4star" ? "var(--rarity-4)"
+                          : "rgba(255,255,255,0.12)",
+                      }}
+                    >
+                      {weaponReq === "any" ? "Any" : weaponReq === "4star" ? "4\u2605+" : "5\u2605 Only"}
+                    </span>
+                  </div>
+
+                  <div className="boss-rule-display">
+                    <span className="boss-rule-display-label">&#9201; Time</span>
+                    <span className="boss-rule-display-val" style={{ color: "var(--text-gold)", borderColor: "rgba(216,179,106,0.35)" }}>
+                      {bossTimeLimit === 60 ? "1 min" : bossTimeLimit === 120 ? "2 mins" : bossTimeLimit === 180 ? "3 mins" : "5 mins"}
+                    </span>
+                  </div>
+
+                  <button
+                    className="boss-randomize-btn"
+                    onClick={pickRules}
+                    title="Re-roll rules"
+                  >
+                    &#9880; Re-roll
+                  </button>
+                </div>
+
+                {/* Timer display — always shown in matchup, bossTimeLimit is auto-picked */}
+                {bossTimeLimit !== null && (
+                  <BossTimer key={bossTimeLimit} seconds={bossTimeLimit} />
+                )}
+
+
                 <div className="matchup-grid">
                   {/* TEAM */}
                   <div className="matchup-team-card glass-panel-inner">
@@ -529,7 +594,7 @@ export default function Home() {
                               title={`Remove ${char.name}`}
                               onClick={() => setHistory((prev) => prev.filter((_, i) => i !== idx))}
                             >
-                              ✕
+                              &#10005;
                             </button>
                           </div>
                           <span className="matchup-portrait-name">{char.name}</span>
