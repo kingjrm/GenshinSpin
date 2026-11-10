@@ -134,7 +134,7 @@
 /* Dashboard Layout */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) minmax(280px, 340px);
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) minmax(260px, 310px);
   gap: 18px;
   align-items: start;
 }
@@ -1486,3 +1486,609 @@ input:checked + .slider:before {
 
 
 
+
+/* ============================================================
+   MANAGE ROSTER BUTTON
+   ============================================================ */
+.manage-roster-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(216, 179, 106, 0.12), rgba(216, 179, 106, 0.05));
+  border: 1px solid rgba(216, 179, 106, 0.35);
+  border-radius: 14px;
+  color: var(--text-gold);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-body);
+}
+.manage-roster-btn:hover {
+  background: linear-gradient(135deg, rgba(216, 179, 106, 0.22), rgba(216, 179, 106, 0.1));
+  border-color: rgba(216, 179, 106, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(216, 179, 106, 0.15);
+}
+
+/* ============================================================
+   ROSTER MODAL
+   ============================================================ */
+.roster-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(5, 7, 15, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.roster-modal-panel {
+  background: linear-gradient(160deg, rgba(18, 20, 36, 0.98) 0%, rgba(10, 12, 22, 0.98) 100%);
+  border: 1px solid rgba(216, 179, 106, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 40px rgba(216, 179, 106, 0.08);
+  width: 100%;
+  max-width: 1000px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.roster-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  flex-shrink: 0;
+}
+
+.roster-modal-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-header);
+}
+
+.roster-modal-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.roster-close-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.roster-close-btn:hover {
+  background: rgba(255, 60, 60, 0.15);
+  border-color: rgba(255, 60, 60, 0.3);
+  color: #ff6060;
+  transform: rotate(90deg);
+}
+
+.roster-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  flex-shrink: 0;
+}
+
+.roster-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.roster-search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+.roster-search-input {
+  width: 100%;
+  padding: 10px 36px 10px 36px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.roster-search-input:focus {
+  border-color: rgba(216, 179, 106, 0.5);
+}
+.roster-search-clear {
+  position: absolute;
+  right: 10px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+
+.roster-pill-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.roster-pill {
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+.roster-pill:hover {
+  border-color: rgba(216, 179, 106, 0.4);
+  color: var(--text-gold);
+}
+.roster-pill.active-gold {
+  background: rgba(216, 179, 106, 0.15);
+  border-color: rgba(216, 179, 106, 0.5);
+  color: var(--text-gold);
+}
+
+.roster-element-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.roster-element-pill {
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+.roster-element-pill:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-light);
+}
+.roster-element-pill.active {
+  font-weight: 800;
+}
+
+.roster-action-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.roster-action-btn {
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+.roster-action-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-light);
+}
+.roster-action-btn.gold {
+  border-color: rgba(216, 179, 106, 0.3);
+  color: var(--text-gold);
+  background: rgba(216, 179, 106, 0.08);
+}
+.roster-action-btn.gold:hover {
+  background: rgba(216, 179, 106, 0.16);
+}
+.roster-action-btn.red {
+  border-color: rgba(255, 80, 60, 0.25);
+  color: rgba(255, 110, 90, 0.9);
+  background: rgba(255, 80, 60, 0.07);
+}
+.roster-action-btn.red:hover {
+  background: rgba(255, 80, 60, 0.14);
+}
+
+/* Grid of character cards */
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  overflow-y: auto;
+  padding: 16px 24px 20px;
+  flex: 1;
+}
+
+.roster-empty {
+  grid-column: 1/-1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.roster-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 6px 8px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: var(--font-body);
+  text-align: center;
+  overflow: hidden;
+}
+.roster-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(216, 179, 106, 0.4);
+  background: rgba(216, 179, 106, 0.06);
+}
+.roster-card-active {
+  border-color: rgba(216, 179, 106, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+}
+.roster-card-inactive {
+  opacity: 0.45;
+  border-color: rgba(255, 255, 255, 0.04);
+}
+.roster-card-inactive:hover {
+  opacity: 0.75;
+}
+
+.roster-card-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.roster-card-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.6rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.active-badge {
+  background: rgba(100, 220, 100, 0.25);
+  border: 1px solid rgba(100, 220, 100, 0.5);
+  color: #80ff80;
+}
+.inactive-badge {
+  background: rgba(255, 60, 60, 0.2);
+  border: 1px solid rgba(255, 60, 60, 0.4);
+  color: #ff8080;
+}
+
+.roster-card-name {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-light);
+  line-height: 1.2;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.roster-card-element {
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.roster-card-rarity {
+  font-size: 0.6rem;
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================
+   TEAM PORTRAIT GRID (sidebar)
+   ============================================================ */
+.team-portrait-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.team-portrait-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.team-portrait-name {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 68px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   TEAM REMOVE BUTTON (on character portrait)
+   ============================================================ */
+.team-remove-btn {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(220, 50, 50, 0.85);
+  border: 1.5px solid rgba(255, 100, 100, 0.5);
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 10;
+  line-height: 1;
+}
+.team-remove-btn:hover {
+  background: rgba(255, 60, 60, 1);
+  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(255, 60, 60, 0.6);
+}
+
+/* Responsive roster modal */
+@media (max-width: 600px) {
+  .roster-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 7px;
+    padding: 12px 14px 16px;
+  }
+  .roster-modal-panel {
+    max-height: 95vh;
+  }
+}
+
+/* ============================================================
+   REDESIGNED FILTER PANEL (v2)
+   ============================================================ */
+.filter-panel-v2 {}
+
+.filter-clear-all-btn {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-pyro);
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.85;
+  font-family: var(--font-body);
+  transition: opacity 0.2s;
+  padding: 0;
+}
+.filter-clear-all-btn:hover { opacity: 1; text-decoration: underline; }
+
+.filter-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.filter-search-icon {
+  position: absolute;
+  left: 10px;
+  font-size: 0.8rem;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.filter-search-input {
+  width: 100%;
+  padding: 9px 32px 9px 32px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.filter-search-input:focus {
+  border-color: rgba(216, 179, 106, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+}
+.filter-search-clear {
+  position: absolute;
+  right: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  background: none;
+  border: none;
+  padding: 4px;
+  transition: color 0.2s;
+}
+.filter-search-clear:hover { color: var(--text-light); }
+
+.filter-section-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-family: var(--font-body);
+}
+
+/* Rarity buttons */
+.filter-rarity-btn {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: var(--font-body);
+}
+.filter-rarity-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-light);
+}
+.filter-rarity-btn.active {
+  color: var(--text-light);
+}
+
+/* Element grid */
+.filter-element-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+.filter-element-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.filter-element-btn:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--text-light);
+  background: rgba(255, 255, 255, 0.06);
+}
+.filter-element-btn.active {
+  font-weight: 800;
+}
+
+/* Weapon + Region */
+.filter-weapon-wrap,
+.filter-region-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.filter-weapon-btn,
+.filter-region-btn {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: var(--font-body);
+}
+.filter-weapon-btn:hover,
+.filter-region-btn:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--text-light);
+}
+.filter-weapon-btn.active,
+.filter-region-btn.active {
+  background: rgba(216, 179, 106, 0.14);
+  border-color: rgba(216, 179, 106, 0.4);
+  color: var(--text-gold);
+}
+
+/* ============================================================
+   TEAM SIZE SELECTOR
+   ============================================================ */
+.team-size-card {}
+
+.team-size-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.team-size-btn {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: var(--font-header);
+  line-height: 1;
+}
+.team-size-btn:hover:not(:disabled) {
+  border-color: rgba(216, 179, 106, 0.4);
+  color: var(--text-gold);
+  background: rgba(216, 179, 106, 0.08);
+}
+.team-size-btn.active {
+  background: linear-gradient(135deg, rgba(216, 179, 106, 0.22), rgba(216, 179, 106, 0.1));
+  border-color: rgba(216, 179, 106, 0.6);
+  color: var(--text-gold);
+  box-shadow: 0 4px 14px rgba(216, 179, 106, 0.18);
+}
+.team-size-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

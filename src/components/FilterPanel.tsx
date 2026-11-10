@@ -3,10 +3,10 @@
 import React from "react";
 
 export interface FilterState {
-  rarity: string; // "all", "5", "4"
-  element: string; // "all", elements...
-  weapon: string; // "all", weapons...
-  region: string; // "all", regions...
+  rarity: string;
+  element: string;
+  weapon: string;
+  region: string;
 }
 
 interface FilterPanelProps {
@@ -17,6 +17,28 @@ interface FilterPanelProps {
   onResetFilters: () => void;
 }
 
+const ELEMENT_PILLS = [
+  { label: "All", value: "all", color: "", icon: "✦" },
+  { label: "Anemo", value: "anemo", color: "#55ffd4", icon: "🌪️" },
+  { label: "Geo", value: "geo", color: "#ffd75e", icon: "⛰️" },
+  { label: "Electro", value: "electro", color: "#e285ff", icon: "⚡" },
+  { label: "Dendro", value: "dendro", color: "#85eb34", icon: "🌿" },
+  { label: "Hydro", value: "hydro", color: "#3cd4ff", icon: "💧" },
+  { label: "Pyro", value: "pyro", color: "#ff6040", icon: "🔥" },
+  { label: "Cryo", value: "cryo", color: "#9cf5ff", icon: "❄️" },
+];
+
+const REGION_PILLS = [
+  { label: "All", value: "all" },
+  { label: "Mondstadt", value: "mondstadt" },
+  { label: "Liyue", value: "liyue" },
+  { label: "Inazuma", value: "inazuma" },
+  { label: "Sumeru", value: "sumeru" },
+  { label: "Fontaine", value: "fontaine" },
+  { label: "Natlan", value: "natlan" },
+  { label: "Nod-Krai", value: "nod-krai" },
+];
+
 export default function FilterPanel({
   search,
   setSearch,
@@ -24,135 +46,127 @@ export default function FilterPanel({
   setFilters,
   onResetFilters,
 }: FilterPanelProps) {
-  const elements = ["All", "Anemo", "Geo", "Electro", "Dendro", "Hydro", "Pyro", "Cryo", "None"];
-  const weapons = ["All", "Sword", "Claymore", "Polearm", "Bow", "Catalyst", "None"];
-  const regions = [
-    "All",
-    "Mondstadt",
-    "Liyue",
-    "Inazuma",
-    "Sumeru",
-    "Fontaine",
-    "Natlan",
-    "Snezhnaya",
-    "Nod-Krai",
-    "None",
-  ];
-
-  const handleFilterChange = (key: keyof FilterState, value: string) => {
-    setFilters({
-      ...filters,
-      [key]: value,
-    });
-  };
+  const isFiltered =
+    search ||
+    filters.rarity !== "all" ||
+    filters.element !== "all" ||
+    filters.weapon !== "all" ||
+    filters.region !== "all";
 
   return (
-    <div className="glass-panel p-6 flex flex-col gap-5 w-full">
+    <div className="filter-panel-v2 glass-panel p-5 flex flex-col gap-4 w-full">
+      {/* Title row */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs uppercase tracking-wider text-muted font-bold">Filters</h3>
+        {isFiltered && (
+          <button
+            onClick={onResetFilters}
+            className="filter-clear-all-btn"
+          >
+            Clear All
+          </button>
+        )}
+      </div>
+
+      {/* Search bar */}
+      <div className="filter-search-wrap">
+        <span className="filter-search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Search characters..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="filter-search-input"
+        />
+        {search && (
+          <button onClick={() => setSearch("")} className="filter-search-clear">✕</button>
+        )}
+      </div>
+
+      {/* Rarity */}
       <div className="flex flex-col gap-2">
-        <h3 className="text-xs uppercase tracking-wider text-muted font-bold">Search & Filters</h3>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search characters..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="search-input"
-          />
-          {search && (
+        <label className="filter-section-label">Rarity</label>
+        <div className="flex gap-2">
+          {[
+            { label: "All", value: "all" },
+            { label: "5★", value: "5" },
+            { label: "4★", value: "4" },
+          ].map((r) => (
             <button
-              onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-gold transition-colors text-sm font-bold"
-              type="button"
+              key={r.value}
+              onClick={() => setFilters({ ...filters, rarity: r.value })}
+              className={`filter-rarity-btn ${filters.rarity === r.value ? "active" : ""}`}
+              style={
+                filters.rarity === r.value
+                  ? { background: r.value === "5" ? "rgba(224,152,44,0.18)" : r.value === "4" ? "rgba(162,86,227,0.18)" : "rgba(255,255,255,0.08)", borderColor: r.value === "5" ? "#e0982c" : r.value === "4" ? "#a256e3" : "rgba(255,255,255,0.3)" }
+                  : {}
+              }
             >
-              ✕
+              {r.label}
             </button>
-          )}
+          ))}
         </div>
       </div>
 
-      <div
-        className="grid gap-4"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
-        }}
-      >
-        {/* Rarity Filter */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] uppercase tracking-widest text-muted font-bold">Rarity</label>
-          <select
-            value={filters.rarity}
-            onChange={(e) => handleFilterChange("rarity", e.target.value)}
-            className="w-full text-sm"
-          >
-            <option value="all">All Rarities</option>
-            <option value="5">★ ★ ★ ★ ★ (5 Star)</option>
-            <option value="4">★ ★ ★ ★ (4 Star)</option>
-          </select>
-        </div>
-
-        {/* Element Filter */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] uppercase tracking-widest text-muted font-bold">Element</label>
-          <select
-            value={filters.element}
-            onChange={(e) => handleFilterChange("element", e.target.value)}
-            className="w-full text-sm"
-          >
-            {elements.map((el) => (
-              <option key={el} value={el.toLowerCase()}>
-                {el}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Weapon Filter */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] uppercase tracking-widest text-muted font-bold">Weapon</label>
-          <select
-            value={filters.weapon}
-            onChange={(e) => handleFilterChange("weapon", e.target.value)}
-            className="w-full text-sm"
-          >
-            {weapons.map((w) => (
-              <option key={w} value={w.toLowerCase()}>
-                {w}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Region Filter */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] uppercase tracking-widest text-muted font-bold">Region</label>
-          <select
-            value={filters.region}
-            onChange={(e) => handleFilterChange("region", e.target.value)}
-            className="w-full text-sm"
-          >
-            {regions.map((r) => (
-              <option key={r} value={r.toLowerCase()}>
-                {r}
-              </option>
-            ))}
-          </select>
+      {/* Element */}
+      <div className="flex flex-col gap-2">
+        <label className="filter-section-label">Element</label>
+        <div className="filter-element-grid">
+          {ELEMENT_PILLS.map((el) => {
+            const isActive = filters.element === el.value;
+            return (
+              <button
+                key={el.value}
+                onClick={() => setFilters({ ...filters, element: el.value })}
+                className={`filter-element-btn ${isActive ? "active" : ""}`}
+                style={
+                  isActive && el.color
+                    ? { background: el.color + "22", borderColor: el.color, color: el.color }
+                    : isActive
+                    ? { background: "rgba(255,255,255,0.1)", borderColor: "rgba(255,255,255,0.3)" }
+                    : {}
+                }
+                title={el.label}
+              >
+                <span>{el.icon}</span>
+                <span>{el.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Quick Reset Filters Button */}
-      {(search ||
-        filters.rarity !== "all" ||
-        filters.element !== "all" ||
-        filters.weapon !== "all" ||
-        filters.region !== "all") && (
-        <button
-          onClick={onResetFilters}
-          className="text-xs text-gold hover:text-gold-hover underline cursor-pointer self-end transition-all"
-        >
-          Clear Active Filters
-        </button>
-      )}
+      {/* Weapon */}
+      <div className="flex flex-col gap-2">
+        <label className="filter-section-label">Weapon</label>
+        <div className="filter-weapon-wrap">
+          {["All", "Sword", "Claymore", "Polearm", "Bow", "Catalyst"].map((w) => (
+            <button
+              key={w}
+              onClick={() => setFilters({ ...filters, weapon: w.toLowerCase() })}
+              className={`filter-weapon-btn ${filters.weapon === w.toLowerCase() ? "active" : ""}`}
+            >
+              {w}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Region */}
+      <div className="flex flex-col gap-2">
+        <label className="filter-section-label">Region</label>
+        <div className="filter-region-wrap">
+          {REGION_PILLS.map((r) => (
+            <button
+              key={r.value}
+              onClick={() => setFilters({ ...filters, region: r.value })}
+              className={`filter-region-btn ${filters.region === r.value ? "active" : ""}`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

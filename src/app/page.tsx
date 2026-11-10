@@ -8,6 +8,7 @@ import Wheel from "@/components/Wheel";
 import BossWheel from "@/components/BossWheel";
 import FilterPanel, { FilterState } from "@/components/FilterPanel";
 import CharacterPool from "@/components/CharacterPool";
+import RosterModal from "@/components/RosterModal";
 import ResultCard from "@/components/ResultCard";
 import BossResultCard from "@/components/BossResultCard";
 import SpinHistory from "@/components/SpinHistory";
@@ -27,9 +28,11 @@ export default function Home() {
     weapon: "all",
     region: "all",
   });
+  const [showRosterModal, setShowRosterModal] = useState(false);
+  const [teamSize, setTeamSize] = useState<1 | 2 | 3 | 4>(4);
   const [result, setResult] = useState<Character | null>(null);
   const [history, setHistory] = useState<Character[]>([]);
-  const [removeAfterSpin, setRemoveAfterSpin] = useState(false);
+  const [removeAfterSpin, setRemoveAfterSpin] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
 
   // Boss state variables
@@ -48,8 +51,8 @@ export default function Home() {
   }, [bossType]);
 
   const teamCharacters = useMemo(() => {
-    return history.slice(0, 4);
-  }, [history]);
+    return history.slice(0, teamSize);
+  }, [history, teamSize]);
 
   // Automatic intro fade-out effect after 1.5 seconds
   React.useEffect(() => {
@@ -67,45 +70,19 @@ export default function Home() {
     };
   }, []);
 
-  // Compute characters matching search/filter dropdowns
+  // Compute filtered characters for the sidebar pool
   const filteredCharacters = useMemo(() => {
     return charactersData.filter((char) => {
-      // Search filter
-      if (search.trim() !== "") {
-        const query = search.toLowerCase();
-        if (!char.name.toLowerCase().includes(query)) {
-          return false;
-        }
-      }
-      // Rarity filter
-      if (filters.rarity !== "all") {
-        if (char.rarity !== parseInt(filters.rarity)) {
-          return false;
-        }
-      }
-      // Element filter
-      if (filters.element !== "all") {
-        if (char.element.toLowerCase() !== filters.element) {
-          return false;
-        }
-      }
-      // Weapon filter
-      if (filters.weapon !== "all") {
-        if (char.weapon.toLowerCase() !== filters.weapon) {
-          return false;
-        }
-      }
-      // Region filter
-      if (filters.region !== "all") {
-        if (char.region.toLowerCase() !== filters.region) {
-          return false;
-        }
-      }
+      if (search.trim() && !char.name.toLowerCase().includes(search.toLowerCase())) return false;
+      if (filters.rarity !== "all" && char.rarity !== parseInt(filters.rarity)) return false;
+      if (filters.element !== "all" && char.element.toLowerCase() !== filters.element) return false;
+      if (filters.weapon !== "all" && char.weapon.toLowerCase() !== filters.weapon) return false;
+      if (filters.region !== "all" && char.region.toLowerCase() !== filters.region) return false;
       return true;
     });
   }, [search, filters]);
 
-  // Compute active characters drawn on the wheel (must be filtered AND selected in pool)
+  // Compute active characters drawn on the wheel (filtered + selected)
   const activeCharacters = useMemo(() => {
     return filteredCharacters.filter((char) => selectedNames.has(char.name));
   }, [filteredCharacters, selectedNames]);
@@ -135,25 +112,25 @@ export default function Home() {
     });
   }, [isSpinning]);
 
-  // Select all visible characters matching current filters
+  // Select all filtered characters
   const handleSelectAll = useCallback(() => {
     if (isSpinning) return;
     setSelectedNames((prev) => {
       const next = new Set(prev);
-      filteredCharacters.forEach((char) => next.add(char.name));
+      filteredCharacters.forEach((c) => next.add(c.name));
       return next;
     });
-  }, [filteredCharacters, isSpinning]);
+  }, [isSpinning, filteredCharacters]);
 
-  // Deselect all visible characters matching current filters
+  // Deselect all filtered characters
   const handleDeselectAll = useCallback(() => {
     if (isSpinning) return;
     setSelectedNames((prev) => {
       const next = new Set(prev);
-      filteredCharacters.forEach((char) => next.delete(char.name));
+      filteredCharacters.forEach((c) => next.delete(c.name));
       return next;
     });
-  }, [filteredCharacters, isSpinning]);
+  }, [isSpinning, filteredCharacters]);
 
   // Reset the pool to default checked state (all 118 checked)
   const handleResetPool = useCallback(() => {
@@ -187,7 +164,7 @@ export default function Home() {
       setResult(character);
       setHistory((prev) => {
         const next = [character, ...prev];
-        if (next.length === 4) {
+        if (next.length === teamSize) {
           setShowBossBattleOverlay(true);
         }
         return next;
@@ -196,7 +173,7 @@ export default function Home() {
         handleRemoveCharacter(character.name);
       }
     },
-    [removeAfterSpin, handleRemoveCharacter]
+    [removeAfterSpin, handleRemoveCharacter, teamSize]
   );
 
   // Clear spin history list
@@ -210,7 +187,8 @@ export default function Home() {
     handleResetFilters();
     setResult(null);
     setHistory([]);
-    setRemoveAfterSpin(false);
+    setRemoveAfterSpin(true);
+    setShowRosterModal(false);
     // Reset boss states
     setBossType(null);
     setSelectedBoss(null);
@@ -273,7 +251,7 @@ export default function Home() {
 
         {/* DASHBOARD GRID */}
         <div className="dashboard-grid">
-          {/* COLUMN 1: Search & Filter and Character Pool */}
+          {/* COLUMN 1: Filters + Character Pool */}
           <aside className="sidebar-left">
             <FilterPanel
               search={search}
@@ -303,7 +281,7 @@ export default function Home() {
                   All characters have been selected!
                 </h2>
                 <p className="text-sm text-muted">
-                  You have spun and removed all 118 characters in the pool. Click below to reload the pool and spin again.
+                  You have spun and removed all characters in the pool. Click below to reload the pool and spin again.
                 </p>
                 <button
                   onClick={handleResetWheel}
@@ -322,8 +300,36 @@ export default function Home() {
                   setIsSpinning={setIsSpinning}
                 />
 
-                {/* Toggle controls below the wheel */}
+                {/* Controls below the wheel */}
                 <div className="flex flex-col gap-4 w-full max-w-[450px]">
+                  {/* Team Size Selector */}
+                  <div className="team-size-card glass-panel p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs uppercase tracking-wider text-muted font-bold">Team Size</span>
+                      <span className="text-xs text-gold font-bold">{history.length}/{teamSize} spun</span>
+                    </div>
+                    <div className="team-size-buttons">
+                      {([1, 2, 3, 4] as const).map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => { setTeamSize(n); setHistory([]); setBossType(null); setSelectedBoss(null); setShowBossBattleOverlay(false); }}
+                          className={`team-size-btn ${teamSize === n ? "active" : ""}`}
+                          disabled={isSpinning}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Manage Roster button */}
+                  <button
+                    onClick={() => setShowRosterModal(true)}
+                    className="manage-roster-btn"
+                  >
+                    👥 Manage Roster ({activeCharacters.length} active)
+                  </button>
+
                   <div className="toggle-card">
                     <div className="toggle-label">
                       <span className="toggle-title">Remove after spin</span>
@@ -346,7 +352,7 @@ export default function Home() {
                     </button>
                   </div>
 
-                  {history.length >= 4 && !showBossBattleOverlay && (
+                  {history.length >= teamSize && !showBossBattleOverlay && (
                     <div className="enter-boss-btn-container w-full">
                       <button
                         onClick={() => setShowBossBattleOverlay(true)}
@@ -361,7 +367,7 @@ export default function Home() {
             )}
           </section>
 
-          {/* COLUMN 3: Spin History & Stats Panel */}
+          {/* COLUMN 3: Spin History & Team Panel */}
           <aside className="sidebar-right">
             <div className="glass-panel p-5 flex flex-col gap-3">
               <h3 className="text-xs uppercase tracking-wider text-muted font-bold">Active Pool Stats</h3>
@@ -389,14 +395,60 @@ export default function Home() {
               </div>
             </div>
 
+            {/* CURRENT TEAM */}
+            {history.length > 0 && (
+              <div className="glass-panel p-5 flex flex-col gap-3">
+                <h3 className="text-xs uppercase tracking-wider text-muted font-bold">
+                  Your Team ({Math.min(history.length, teamSize)}/{teamSize})
+                </h3>
+                <div className="team-portrait-grid">
+                  {history.slice(0, teamSize).map((char, idx) => (
+                    <div key={`${char.name}-${idx}`} className="team-portrait-item">
+                      <div className="relative">
+                        <CharacterImage
+                          name={char.name}
+                          src={char.image}
+                          element={char.element}
+                          rarity={char.rarity}
+                          size={58}
+                        />
+                        <button
+                          className="team-remove-btn"
+                          title={`Remove ${char.name} from team`}
+                          onClick={() => {
+                            setHistory((prev) => prev.filter((_, i) => i !== idx));
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <span className="team-portrait-name">{char.name.split(" ")[0]}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <SpinHistory history={history} onClearHistory={handleClearHistory} />
           </aside>
         </div>
 
       </div>
 
+      {/* ROSTER MODAL */}
+      {showRosterModal && (
+        <RosterModal
+          selectedNames={selectedNames}
+          onToggleCharacter={handleToggleCharacter}
+          onSelectVisible={(names) => { if (!isSpinning) setSelectedNames((prev) => { const n = new Set(prev); names.forEach(name => n.add(name)); return n; }); }}
+          onDeselectVisible={(names) => { if (!isSpinning) setSelectedNames((prev) => { const n = new Set(prev); names.forEach(name => n.delete(name)); return n; }); }}
+          onResetPool={handleResetPool}
+          onClose={() => setShowRosterModal(false)}
+        />
+      )}
+
       {/* BOSS BATTLE OVERLAY */}
-      {showBossBattleOverlay && history.length >= 4 && typeof document !== "undefined" && createPortal(
+      {showBossBattleOverlay && history.length >= teamSize && typeof document !== "undefined" && createPortal(
         <div className="boss-battle-overlay" onClick={() => setShowBossBattleOverlay(false)}>
           <div className="boss-battle-section glass-panel" onClick={(e) => e.stopPropagation()}>
             <button
@@ -458,15 +510,24 @@ export default function Home() {
                   <div className="matchup-team-card glass-panel-inner">
                     <h3 className="matchup-card-title">YOUR TEAM</h3>
                     <div className="matchup-team-portraits">
-                      {teamCharacters.map((char) => (
+                      {teamCharacters.map((char, idx) => (
                         <div key={char.name} className="matchup-portrait-item">
-                          <CharacterImage
-                            name={char.name}
-                            src={char.image}
-                            element={char.element}
-                            rarity={char.rarity}
-                            size={76}
-                          />
+                          <div className="relative">
+                            <CharacterImage
+                              name={char.name}
+                              src={char.image}
+                              element={char.element}
+                              rarity={char.rarity}
+                              size={76}
+                            />
+                            <button
+                              className="team-remove-btn"
+                              title={`Remove ${char.name}`}
+                              onClick={() => setHistory((prev) => prev.filter((_, i) => i !== idx))}
+                            >
+                              ✕
+                            </button>
+                          </div>
                           <span className="matchup-portrait-name">{char.name}</span>
                         </div>
                       ))}

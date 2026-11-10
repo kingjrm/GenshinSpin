@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 
 interface CharacterImageProps {
   name: string;
@@ -13,6 +12,22 @@ interface CharacterImageProps {
   priority?: boolean;
 }
 
+const ELEMENT_GRADIENTS: Record<string, string> = {
+  Pyro:    "linear-gradient(135deg, #c0392b, #e67e22)",
+  Hydro:   "linear-gradient(135deg, #1a6fa8, #2ecc71)",
+  Cryo:    "linear-gradient(135deg, #74b9ff, #dfe6e9)",
+  Electro: "linear-gradient(135deg, #6c3483, #a569bd)",
+  Dendro:  "linear-gradient(135deg, #1e8449, #58d68d)",
+  Anemo:   "linear-gradient(135deg, #148f77, #1abc9c)",
+  Geo:     "linear-gradient(135deg, #9a7d0a, #d4ac0d)",
+  None:    "linear-gradient(135deg, #34495e, #7f8c8d)",
+};
+
+const RARITY_BORDER: Record<number, string> = {
+  5: "#e0982c",
+  4: "#a256e3",
+};
+
 export default function CharacterImage({
   name,
   src,
@@ -20,94 +35,66 @@ export default function CharacterImage({
   rarity,
   className = "",
   size = 80,
-  priority = false,
 }: CharacterImageProps) {
-  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
 
-  // Extract initials (e.g., "Raiden Shogun" -> "RS", "Albedo" -> "AL")
-  const getInitials = (charName: string) => {
-    const parts = charName.split(" ");
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return charName.slice(0, 2).toUpperCase();
+  const gradient = ELEMENT_GRADIENTS[element] || ELEMENT_GRADIENTS.None;
+  const border   = RARITY_BORDER[rarity] ?? "#7c7f8a";
+
+  const getInitials = (n: string) => {
+    const parts = n.split(" ");
+    return parts.length >= 2
+      ? (parts[0][0] + parts[1][0]).toUpperCase()
+      : n.slice(0, 2).toUpperCase();
   };
 
-  const elementColors: Record<string, string> = {
-    Pyro: "linear-gradient(135deg, #ff4d4d, #ff9933)",
-    Hydro: "linear-gradient(135deg, #3399ff, #33ffff)",
-    Cryo: "linear-gradient(135deg, #99ffff, #ffffff)",
-    Electro: "linear-gradient(135deg, #cc33ff, #ff66ff)",
-    Dendro: "linear-gradient(135deg, #33cc33, #99ff33)",
-    Anemo: "linear-gradient(135deg, #00ffcc, #66ffa6)",
-    Geo: "linear-gradient(135deg, #ffcc00, #ffaa00)",
-    None: "linear-gradient(135deg, #7a7d85, #b0b3b8)",
+  const baseStyle: React.CSSProperties = {
+    width:  size,
+    height: size,
+    minWidth: size,
+    borderRadius: "50%",
+    border: `2.5px solid ${border}`,
+    overflow: "hidden",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    boxShadow: `0 0 10px ${border}55, 0 4px 12px rgba(0,0,0,0.5)`,
   };
 
-  const gradient = elementColors[element] || elementColors.None;
-
-  if (!src || failedSrc === src) {
+  if (!src || failed) {
     return (
       <div
-        className={`relative flex items-center justify-center select-none font-semibold ${className}`}
-        style={{
-          width: size,
-          height: size,
-          background: gradient,
-          borderRadius: "50%",
-          overflow: "hidden",
-          boxShadow: `0 0 12px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.4)`,
-          color: element === "Cryo" || element === "Anemo" ? "#111" : "#fff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: size * 0.35,
-          fontFamily: "var(--font-header)",
-          border: `2px solid ${rarity === 5 ? "var(--rarity-5)" : "var(--rarity-4)"}`,
-          textShadow: element === "Cryo" || element === "Anemo" ? "none" : "0 2px 4px rgba(0,0,0,0.6)",
-        }}
-        title={`${name} (${element})`}
+        className={`select-none ${className}`}
+        style={{ ...baseStyle, background: gradient }}
+        title={name}
       >
-        <span>{getInitials(name)}</span>
-        <span
-          className="absolute text-[8px] uppercase tracking-wider font-bold"
-          style={{
-            bottom: size * 0.08,
-            fontSize: size * 0.14,
-            opacity: 0.8,
-            fontFamily: "var(--font-body)",
-          }}
-        >
-          {element !== "None" ? element : ""}
+        <span style={{
+          fontSize: size * 0.33,
+          fontWeight: 800,
+          color: element === "Cryo" || element === "Geo" ? "#111" : "#fff",
+          fontFamily: "var(--font-header)",
+          textShadow: "0 1px 4px rgba(0,0,0,0.6)",
+          letterSpacing: "0.02em",
+        }}>
+          {getInitials(name)}
         </span>
       </div>
     );
   }
 
   return (
-    <div
-      className={`relative overflow-hidden ${className}`}
-      style={{
-        width: size,
-        height: size,
-        borderRadius: "50%",
-        overflow: "hidden",
-        border: `2px solid ${rarity === 5 ? "var(--rarity-5)" : "var(--rarity-4)"}`,
-        boxShadow: `0 4px 10px rgba(0, 0, 0, 0.4), 0 0 8px ${
-          rarity === 5 ? "rgba(224, 152, 44, 0.2)" : "rgba(162, 86, 227, 0.2)"
-        }`,
-        background: "rgba(20, 20, 35, 0.5)",
-      }}
-    >
-      <Image
+    <div className={className} style={{ ...baseStyle, background: "rgba(10,10,20,0.6)" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={src}
         alt={name}
         width={size}
         height={size}
-        className="object-cover w-full h-full transform hover:scale-110 transition-transform duration-300"
-        onError={() => setFailedSrc(src)}
-        priority={priority}
-        unoptimized // Allows downloading from CDN directly without sizing queries
+        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        onError={() => setFailed(true)}
+        loading="lazy"
+        crossOrigin="anonymous"
       />
     </div>
   );
