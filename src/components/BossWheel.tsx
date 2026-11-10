@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { Boss, getBossImageUrl } from "@/data/bosses";
+import { Boss } from "@/data/bosses";
 
 interface BossWheelProps {
   activeBosses: Boss[];
@@ -67,35 +67,22 @@ export default function BossWheel({
     const total = activeBosses.length;
 
     const tryLoad = (boss: Boss) => {
-      const primary = getBossImageUrl(boss, "portrait");
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.referrerPolicy = "no-referrer";
+      const filename = (boss as { wikiFilename?: string }).wikiFilename
+        || `Enemy_${boss.name.replace(/ /g, "_").replace(/:/g, "").replace(/'/g, "")}.png`;
+      const proxyUrl = `/api/boss-image?file=${encodeURIComponent(filename)}`;
 
+      const img = new Image();
       img.onload = () => {
         map.set(boss.name, img);
         loaded++;
         if (loaded === total) { imagesRef.current = map; setImagesReady(true); }
       };
       img.onerror = () => {
-        // Try fallback: fandom icon instead of portrait
-        const fallbackImg = new Image();
-        fallbackImg.crossOrigin = "anonymous";
-        fallbackImg.referrerPolicy = "no-referrer";
-        const fallbackUrl = getBossImageUrl(boss, "icon");
-        fallbackImg.src = fallbackUrl;
-        fallbackImg.onload = () => {
-          map.set(boss.name, fallbackImg);
-          loaded++;
-          if (loaded === total) { imagesRef.current = map; setImagesReady(true); }
-        };
-        fallbackImg.onerror = () => {
-          map.set(boss.name, null); // null = use text fallback
-          loaded++;
-          if (loaded === total) { imagesRef.current = map; setImagesReady(true); }
-        };
+        map.set(boss.name, null);
+        loaded++;
+        if (loaded === total) { imagesRef.current = map; setImagesReady(true); }
       };
-      img.src = primary;
+      img.src = proxyUrl;
     };
 
     activeBosses.forEach(tryLoad);

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Boss, getBossImageUrl, getRegionElement } from "@/data/bosses";
+import { Boss, getRegionElement } from "@/data/bosses";
 
 const REGION_GRADIENTS: Record<string, string> = {
   Mondstadt:  "linear-gradient(135deg, #148f77, #1abc9c)",
@@ -27,19 +27,6 @@ const REGION_BORDER: Record<string, string> = {
   None:       "#7f8c8d",
 };
 
-// Get a secondary CDN url (direct static.wikia.nocookie.net)
-// Fandom image paths follow the pattern: /X/YY/Filename.png
-// We can't predict the hash without knowing it, so we just use Fandom redirect as primary
-// and show fallback art on failure
-function getSecondaryUrl(boss: Boss): string {
-  // Try gi.yatta.moe which sometimes has boss thumbnails via different naming
-  const sanitized = boss.name
-    .replace(/[^a-zA-Z0-9 ]/g, "")
-    .trim()
-    .replace(/ +/g, "_");
-  return `https://gi.yatta.moe/assets/UI/monster/UI_MonsterIcon_${sanitized}.png`;
-}
-
 interface BossImageProps {
   boss: Boss;
   size?: number;
@@ -53,10 +40,7 @@ export default function BossImage({
   shape = "circle",
   className = "",
 }: BossImageProps) {
-  const [stage, setStage] = useState<"primary" | "secondary" | "fallback">("primary");
-
-  const primaryUrl = getBossImageUrl(boss, "portrait");
-  const secondaryUrl = getSecondaryUrl(boss);
+  const [failed, setFailed] = useState(false);
 
   const gradient = REGION_GRADIENTS[boss.region] ?? REGION_GRADIENTS.None;
   const border   = REGION_BORDER[boss.region]    ?? REGION_BORDER.None;
@@ -84,7 +68,7 @@ export default function BossImage({
     return name.slice(0, 2).toUpperCase();
   };
 
-  if (stage === "fallback") {
+  if (failed) {
     return (
       <div
         className={`select-none ${className}`}
@@ -108,23 +92,22 @@ export default function BossImage({
     );
   }
 
-  const currentSrc = stage === "primary" ? primaryUrl : secondaryUrl;
+  // Proxy URL — resolved server-side via /api/boss-image
+  const filename = boss.wikiFilename
+    || `Enemy_${boss.name.replace(/ /g, "_").replace(/:/g, "").replace(/'/g, "")}.png`;
+  const src = `/api/boss-image?file=${encodeURIComponent(filename)}`;
 
   return (
     <div className={className} style={{ ...baseStyle, background: "rgba(10,10,20,0.6)" }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={currentSrc}
+        src={src}
         alt={boss.name}
         width={size}
         height={size}
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-        onError={() => {
-          if (stage === "primary") setStage("secondary");
-          else setStage("fallback");
-        }}
+        onError={() => setFailed(true)}
         loading="lazy"
-        referrerPolicy="no-referrer"
       />
     </div>
   );

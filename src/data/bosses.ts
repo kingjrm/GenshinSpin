@@ -132,12 +132,11 @@ export const localLegends: Boss[] = [
 
 export const bossesData: Boss[] = [...worldBosses, ...weeklyBosses, ...localLegends];
 
-export function getBossImageUrl(boss: Boss, type: "icon" | "portrait" = "icon"): string {
-  if (boss.apiId) {
-    return `https://genshin.jmp.blue/boss/weekly-boss/${boss.apiId}/${type}`;
-  }
-  const filename = boss.wikiFilename || `Enemy_${boss.name.replace(/ /g, "_").replace(/:/g, "").replace(/'/g, "%27")}.png`;
-  return `https://genshin-impact.fandom.com/wiki/Special:FilePath/${filename}`;
+export function getBossImageUrl(boss: Boss, _type: "icon" | "portrait" = "icon"): string {
+  // Use our server-side proxy which resolves Fandom URLs and bypasses hotlink protection
+  const filename = boss.wikiFilename
+    || `Enemy_${boss.name.replace(/ /g, "_").replace(/:/g, "").replace(/'/g, "")}.png`;
+  return `/api/boss-image?file=${encodeURIComponent(filename)}`;
 }
 
 export function getRegionElement(region: string): "Anemo" | "Geo" | "Electro" | "Dendro" | "Hydro" | "Pyro" | "Cryo" | "None" {
