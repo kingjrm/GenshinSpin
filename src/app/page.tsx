@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
@@ -24,9 +24,9 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<FilterState>({
     rarity: "all",
-    element: "all",
-    weapon: "all",
-    region: "all",
+    elements: [],
+    weapons: [],
+    regions: [],
   });
   const [showRosterModal, setShowRosterModal] = useState(false);
   const [teamSize, setTeamSize] = useState<1 | 2 | 3 | 4>(4);
@@ -75,9 +75,9 @@ export default function Home() {
     return charactersData.filter((char) => {
       if (search.trim() && !char.name.toLowerCase().includes(search.toLowerCase())) return false;
       if (filters.rarity !== "all" && char.rarity !== parseInt(filters.rarity)) return false;
-      if (filters.element !== "all" && char.element.toLowerCase() !== filters.element) return false;
-      if (filters.weapon !== "all" && char.weapon.toLowerCase() !== filters.weapon) return false;
-      if (filters.region !== "all" && char.region.toLowerCase() !== filters.region) return false;
+      if (filters.elements.length > 0 && !filters.elements.includes(char.element.toLowerCase())) return false;
+      if (filters.weapons.length > 0 && !filters.weapons.includes(char.weapon.toLowerCase())) return false;
+      if (filters.regions.length > 0 && !filters.regions.includes(char.region.toLowerCase())) return false;
       return true;
     });
   }, [search, filters]);
@@ -143,9 +143,9 @@ export default function Home() {
     setSearch("");
     setFilters({
       rarity: "all",
-      element: "all",
-      weapon: "all",
-      region: "all",
+      elements: [],
+      weapons: [],
+      regions: [],
     });
   }, []);
 
@@ -276,7 +276,7 @@ export default function Home() {
             {allCharactersSelectedGone ? (
               /* ALL CHARACTERS SELECTED SCREEN */
               <div className="glass-panel result-empty-state">
-                <span className="text-4xl">🎉</span>
+                <span className="text-4xl" style={{ color: "var(--text-gold)" }}>&#10022;</span>
                 <h2 className="text-xl font-bold text-white uppercase tracking-wider">
                   All characters have been selected!
                 </h2>
@@ -302,33 +302,37 @@ export default function Home() {
 
                 {/* Controls below the wheel */}
                 <div className="flex flex-col gap-4 w-full max-w-[450px]">
-                  {/* Team Size Selector */}
-                  <div className="team-size-card glass-panel p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs uppercase tracking-wider text-muted font-bold">Team Size</span>
-                      <span className="text-xs text-gold font-bold">{history.length}/{teamSize} spun</span>
-                    </div>
-                    <div className="team-size-buttons">
-                      {([1, 2, 3, 4] as const).map((n) => (
-                        <button
-                          key={n}
-                          onClick={() => { setTeamSize(n); setHistory([]); setBossType(null); setSelectedBoss(null); setShowBossBattleOverlay(false); }}
-                          className={`team-size-btn ${teamSize === n ? "active" : ""}`}
-                          disabled={isSpinning}
-                        >
-                          {n}
-                        </button>
-                      ))}
+                  {/* Manage Roster + Team Size side by side */}
+                  <div className="roster-teamsize-row">
+                    {/* Manage Roster button */}
+                    <button
+                      onClick={() => setShowRosterModal(true)}
+                      className="manage-roster-btn"
+                    >
+                      &#9876; Manage Roster
+                      <span className="roster-count-badge">{activeCharacters.length}</span>
+                    </button>
+
+                    {/* Team Size Selector */}
+                    <div className="team-size-inline glass-panel">
+                      <div className="team-size-label-col">
+                        <span className="team-size-label">Team</span>
+                        <span className="team-size-progress">{history.length}/{teamSize}</span>
+                      </div>
+                      <div className="team-size-buttons-inline">
+                        {([1, 2, 3, 4] as const).map((n) => (
+                          <button
+                            key={n}
+                            onClick={() => { setTeamSize(n); setHistory([]); setBossType(null); setSelectedBoss(null); setShowBossBattleOverlay(false); }}
+                            className={`team-size-btn ${teamSize === n ? "active" : ""}`}
+                            disabled={isSpinning}
+                          >
+                            {n}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-
-                  {/* Manage Roster button */}
-                  <button
-                    onClick={() => setShowRosterModal(true)}
-                    className="manage-roster-btn"
-                  >
-                    👥 Manage Roster ({activeCharacters.length} active)
-                  </button>
 
                   <div className="toggle-card">
                     <div className="toggle-label">
@@ -358,7 +362,7 @@ export default function Home() {
                         onClick={() => setShowBossBattleOverlay(true)}
                         className="enter-boss-battle-btn w-full"
                       >
-                        ⚔️ Enter Boss Battle ⚔️
+                        &#9876; Enter Boss Battle &#9876;
                       </button>
                     </div>
                   )}

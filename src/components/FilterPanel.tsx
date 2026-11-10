@@ -4,9 +4,9 @@ import React from "react";
 
 export interface FilterState {
   rarity: string;
-  element: string;
-  weapon: string;
-  region: string;
+  elements: string[];
+  weapons: string[];
+  regions: string[];
 }
 
 interface FilterPanelProps {
@@ -18,26 +18,31 @@ interface FilterPanelProps {
 }
 
 const ELEMENT_PILLS = [
-  { label: "All", value: "all", color: "", icon: "✦" },
-  { label: "Anemo", value: "anemo", color: "#55ffd4", icon: "🌪️" },
-  { label: "Geo", value: "geo", color: "#ffd75e", icon: "⛰️" },
-  { label: "Electro", value: "electro", color: "#e285ff", icon: "⚡" },
-  { label: "Dendro", value: "dendro", color: "#85eb34", icon: "🌿" },
-  { label: "Hydro", value: "hydro", color: "#3cd4ff", icon: "💧" },
-  { label: "Pyro", value: "pyro", color: "#ff6040", icon: "🔥" },
-  { label: "Cryo", value: "cryo", color: "#9cf5ff", icon: "❄️" },
+  { label: "Anemo",   value: "anemo",   color: "#55ffd4", dot: "●" },
+  { label: "Geo",     value: "geo",     color: "#ffd75e", dot: "●" },
+  { label: "Electro", value: "electro", color: "#e285ff", dot: "●" },
+  { label: "Dendro",  value: "dendro",  color: "#85eb34", dot: "●" },
+  { label: "Hydro",   value: "hydro",   color: "#3cd4ff", dot: "●" },
+  { label: "Pyro",    value: "pyro",    color: "#ff6040", dot: "●" },
+  { label: "Cryo",    value: "cryo",    color: "#9cf5ff", dot: "●" },
 ];
 
 const REGION_PILLS = [
-  { label: "All", value: "all" },
   { label: "Mondstadt", value: "mondstadt" },
-  { label: "Liyue", value: "liyue" },
-  { label: "Inazuma", value: "inazuma" },
-  { label: "Sumeru", value: "sumeru" },
-  { label: "Fontaine", value: "fontaine" },
-  { label: "Natlan", value: "natlan" },
-  { label: "Nod-Krai", value: "nod-krai" },
+  { label: "Liyue",     value: "liyue" },
+  { label: "Inazuma",   value: "inazuma" },
+  { label: "Sumeru",    value: "sumeru" },
+  { label: "Fontaine",  value: "fontaine" },
+  { label: "Natlan",    value: "natlan" },
+  { label: "Nod-Krai",  value: "nod-krai" },
+  { label: "Snezhnaya", value: "snezhnaya" },
 ];
+
+const WEAPON_TYPES = ["Sword", "Claymore", "Polearm", "Bow", "Catalyst"];
+
+function toggleArr(arr: string[], val: string): string[] {
+  return arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val];
+}
 
 export default function FilterPanel({
   search,
@@ -49,9 +54,9 @@ export default function FilterPanel({
   const isFiltered =
     search ||
     filters.rarity !== "all" ||
-    filters.element !== "all" ||
-    filters.weapon !== "all" ||
-    filters.region !== "all";
+    filters.elements.length > 0 ||
+    filters.weapons.length > 0 ||
+    filters.regions.length > 0;
 
   return (
     <div className="filter-panel-v2 glass-panel p-5 flex flex-col gap-4 w-full">
@@ -59,18 +64,15 @@ export default function FilterPanel({
       <div className="flex items-center justify-between">
         <h3 className="text-xs uppercase tracking-wider text-muted font-bold">Filters</h3>
         {isFiltered && (
-          <button
-            onClick={onResetFilters}
-            className="filter-clear-all-btn"
-          >
-            Clear All
+          <button onClick={onResetFilters} className="filter-clear-all-btn">
+            ✕ Clear
           </button>
         )}
       </div>
 
       {/* Search bar */}
       <div className="filter-search-wrap">
-        <span className="filter-search-icon">🔍</span>
+        <span className="filter-search-icon" style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>&#9906;</span>
         <input
           type="text"
           placeholder="Search characters..."
@@ -79,7 +81,7 @@ export default function FilterPanel({
           className="filter-search-input"
         />
         {search && (
-          <button onClick={() => setSearch("")} className="filter-search-clear">✕</button>
+          <button onClick={() => setSearch("")} className="filter-search-clear">&#10005;</button>
         )}
       </div>
 
@@ -89,8 +91,8 @@ export default function FilterPanel({
         <div className="flex gap-2">
           {[
             { label: "All", value: "all" },
-            { label: "5★", value: "5" },
-            { label: "4★", value: "4" },
+            { label: "5\u2605", value: "5" },
+            { label: "4\u2605", value: "4" },
           ].map((r) => (
             <button
               key={r.value}
@@ -108,27 +110,30 @@ export default function FilterPanel({
         </div>
       </div>
 
-      {/* Element */}
+      {/* Element — multi-select */}
       <div className="flex flex-col gap-2">
-        <label className="filter-section-label">Element</label>
+        <label className="filter-section-label">
+          Element
+          {filters.elements.length > 0 && (
+            <span className="filter-count-badge">{filters.elements.length}</span>
+          )}
+        </label>
         <div className="filter-element-grid">
           {ELEMENT_PILLS.map((el) => {
-            const isActive = filters.element === el.value;
+            const isActive = filters.elements.includes(el.value);
             return (
               <button
                 key={el.value}
-                onClick={() => setFilters({ ...filters, element: el.value })}
+                onClick={() => setFilters({ ...filters, elements: toggleArr(filters.elements, el.value) })}
                 className={`filter-element-btn ${isActive ? "active" : ""}`}
                 style={
-                  isActive && el.color
+                  isActive
                     ? { background: el.color + "22", borderColor: el.color, color: el.color }
-                    : isActive
-                    ? { background: "rgba(255,255,255,0.1)", borderColor: "rgba(255,255,255,0.3)" }
                     : {}
                 }
                 title={el.label}
               >
-                <span>{el.icon}</span>
+                <span style={{ color: el.color, fontSize: "0.65rem" }}>{el.dot}</span>
                 <span>{el.label}</span>
               </button>
             );
@@ -136,35 +141,52 @@ export default function FilterPanel({
         </div>
       </div>
 
-      {/* Weapon */}
+      {/* Weapon — multi-select */}
       <div className="flex flex-col gap-2">
-        <label className="filter-section-label">Weapon</label>
+        <label className="filter-section-label">
+          Weapon
+          {filters.weapons.length > 0 && (
+            <span className="filter-count-badge">{filters.weapons.length}</span>
+          )}
+        </label>
         <div className="filter-weapon-wrap">
-          {["All", "Sword", "Claymore", "Polearm", "Bow", "Catalyst"].map((w) => (
-            <button
-              key={w}
-              onClick={() => setFilters({ ...filters, weapon: w.toLowerCase() })}
-              className={`filter-weapon-btn ${filters.weapon === w.toLowerCase() ? "active" : ""}`}
-            >
-              {w}
-            </button>
-          ))}
+          {WEAPON_TYPES.map((w) => {
+            const val = w.toLowerCase();
+            const isActive = filters.weapons.includes(val);
+            return (
+              <button
+                key={w}
+                onClick={() => setFilters({ ...filters, weapons: toggleArr(filters.weapons, val) })}
+                className={`filter-weapon-btn ${isActive ? "active" : ""}`}
+              >
+                {w}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Region */}
+      {/* Region — multi-select */}
       <div className="flex flex-col gap-2">
-        <label className="filter-section-label">Region</label>
+        <label className="filter-section-label">
+          Region
+          {filters.regions.length > 0 && (
+            <span className="filter-count-badge">{filters.regions.length}</span>
+          )}
+        </label>
         <div className="filter-region-wrap">
-          {REGION_PILLS.map((r) => (
-            <button
-              key={r.value}
-              onClick={() => setFilters({ ...filters, region: r.value })}
-              className={`filter-region-btn ${filters.region === r.value ? "active" : ""}`}
-            >
-              {r.label}
-            </button>
-          ))}
+          {REGION_PILLS.map((r) => {
+            const isActive = filters.regions.includes(r.value);
+            return (
+              <button
+                key={r.value}
+                onClick={() => setFilters({ ...filters, regions: toggleArr(filters.regions, r.value) })}
+                className={`filter-region-btn ${isActive ? "active" : ""}`}
+              >
+                {r.label}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

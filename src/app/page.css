@@ -1488,27 +1488,90 @@ input:checked + .slider:before {
 
 
 /* ============================================================
-   MANAGE ROSTER BUTTON
+   ROSTER + TEAM SIZE ROW (side by side)
    ============================================================ */
-.manage-roster-btn {
+.roster-teamsize-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
   width: 100%;
-  padding: 14px 20px;
+}
+
+.manage-roster-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
   background: linear-gradient(135deg, rgba(216, 179, 106, 0.12), rgba(216, 179, 106, 0.05));
   border: 1px solid rgba(216, 179, 106, 0.35);
   border-radius: 14px;
   color: var(--text-gold);
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: var(--font-body);
+  white-space: nowrap;
 }
 .manage-roster-btn:hover {
   background: linear-gradient(135deg, rgba(216, 179, 106, 0.22), rgba(216, 179, 106, 0.1));
   border-color: rgba(216, 179, 106, 0.6);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(216, 179, 106, 0.15);
+}
+
+.roster-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 20px;
+  padding: 0 6px;
+  background: rgba(216, 179, 106, 0.22);
+  border: 1px solid rgba(216, 179, 106, 0.4);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-gold);
+}
+
+.team-size-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px !important;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.team-size-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.team-size-buttons-inline {
+  display: flex;
+  gap: 5px;
+}
+.team-size-label-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.team-size-progress {
+  font-size: 0.65rem;
+  color: var(--text-gold);
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 /* ============================================================
@@ -2029,6 +2092,22 @@ input:checked + .slider:before {
   color: var(--text-muted);
   font-weight: 700;
   font-family: var(--font-body);
+}
+.filter-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 5px;
+  background: rgba(216, 179, 106, 0.2);
+  border: 1px solid rgba(216, 179, 106, 0.4);
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--text-gold);
+  margin-left: 6px;
+  vertical-align: middle;
 }
 
 /* Rarity buttons */
