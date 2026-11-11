@@ -47,6 +47,8 @@ export default function Home() {
   // Optional boss rules
   const [bossTimeLimit, setBossTimeLimit] = useState<number | null>(null);
   const [weaponReq, setWeaponReq] = useState<"any" | "4star" | "5star">("any");
+  const [customTimeMin, setCustomTimeMin] = useState<string>("");
+  const [customTimeSec, setCustomTimeSec] = useState<string>("");
 
   const activeBosses = useMemo(() => {
     if (bossType === "world") return worldBosses;
@@ -555,8 +557,44 @@ export default function Home() {
                   <div className="boss-rule-display">
                     <span className="boss-rule-display-label">&#9201; Time</span>
                     <span className="boss-rule-display-val" style={{ color: "var(--text-gold)", borderColor: "rgba(216,179,106,0.35)" }}>
-                      {bossTimeLimit === 60 ? "1 min" : bossTimeLimit === 120 ? "2 mins" : bossTimeLimit === 180 ? "3 mins" : "5 mins"}
+                      {bossTimeLimit !== null ? (bossTimeLimit < 60 ? `${bossTimeLimit}s` : bossTimeLimit % 60 === 0 ? `${bossTimeLimit / 60}m` : `${Math.floor(bossTimeLimit/60)}m${bossTimeLimit%60}s`) : "--"}
                     </span>
+                  </div>
+
+                  {/* Custom time input */}
+                  <div className="custom-time-wrap">
+                    <span className="custom-time-label">Custom</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={99}
+                      placeholder="mm"
+                      value={customTimeMin}
+                      onChange={(e) => setCustomTimeMin(e.target.value)}
+                      className="custom-time-input"
+                      title="Minutes"
+                    />
+                    <span className="custom-time-unit">m</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={59}
+                      placeholder="ss"
+                      value={customTimeSec}
+                      onChange={(e) => setCustomTimeSec(e.target.value)}
+                      className="custom-time-input"
+                      title="Seconds"
+                    />
+                    <span className="custom-time-unit">s</span>
+                    <button
+                      className="custom-time-apply"
+                      onClick={() => {
+                        const totalSec = (parseInt(customTimeMin || "0") * 60) + parseInt(customTimeSec || "0");
+                        if (totalSec > 0) setBossTimeLimit(totalSec);
+                      }}
+                    >
+                      Set
+                    </button>
                   </div>
 
                   <button
@@ -638,6 +676,8 @@ export default function Home() {
                     NEW TEAM
                   </button>
                 </div>
+
+                <div className="card-signature">Genspin by Rom</div>
               </div>
             )}
           </div>

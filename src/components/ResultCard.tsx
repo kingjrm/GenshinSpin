@@ -142,6 +142,9 @@ export default function ResultCard({
             </button>
           )}
         </div>
+
+        {/* Signature */}
+        <div className="card-signature">Genspin by Rom</div>
       </div>
     </div>
   );

@@ -2885,3 +2885,79 @@ input:checked + .slider:before {
   background: rgba(0,0,0,0.25);
   white-space: nowrap;
 }
+
+/* ============================================================
+   CARD SIGNATURE — "Genspin by Rom" (Pixelify Sans only)
+   ============================================================ */
+.card-signature {
+  font-family: var(--font-signature);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(216, 179, 106, 0.45);
+  text-align: center;
+  margin-top: auto;
+  padding-top: 10px;
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+}
+
+/* ============================================================
+   CUSTOM TIME LIMIT INPUT
+   ============================================================ */
+.custom-time-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.custom-time-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.custom-time-input {
+  width: 54px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(216, 179, 106, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-gold);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: var(--font-header);
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.custom-time-input:focus {
+  border-color: rgba(216, 179, 106, 0.65);
+  background: rgba(216, 179, 106, 0.07);
+}
+.custom-time-unit {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.custom-time-apply {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(216, 179, 106, 0.35);
+  background: rgba(216, 179, 106, 0.1);
+  color: var(--text-gold);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+.custom-time-apply:hover {
+  background: rgba(216, 179, 106, 0.22);
+  border-color: rgba(216, 179, 106, 0.6);
+}

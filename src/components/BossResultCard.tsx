@@ -112,6 +112,9 @@ export default function BossResultCard({
             Acknowledge Challenge
           </button>
         </div>
+
+        {/* Signature */}
+        <div className="card-signature">Genspin by Rom</div>
       </div>
     </div>
   );
