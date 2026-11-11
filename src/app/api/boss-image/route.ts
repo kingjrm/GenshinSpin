@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// In-memory cache: filename → actual CDN URL
+// In-memory LRU-style cache: filename → actual CDN URL
+// Cap at 200 entries to prevent unbounded memory growth
 const urlCache = new Map<string, string>();
+const URL_CACHE_MAX = 200;
+
+function cacheSet(key: string, value: string) {
+  if (urlCache.size >= URL_CACHE_MAX) {
+    // Evict the oldest entry (first inserted)
+    const firstKey = urlCache.keys().next().value;
+    if (firstKey) urlCache.delete(firstKey);
+  }
+  urlCache.set(key, value);
+}
 
 // MediaWiki API: resolve File: → actual static CDN URL
 async function resolveWikiImageUrl(filename: string): Promise<string | null> {
@@ -74,7 +85,7 @@ export async function GET(request: NextRequest) {
     // Resolve via MediaWiki API
     cdnUrl = (await resolveWikiImageUrl(sanitized)) ?? undefined;
     if (cdnUrl) {
-      urlCache.set(sanitized, cdnUrl);
+      cacheSet(sanitized, cdnUrl);
     }
   }
 

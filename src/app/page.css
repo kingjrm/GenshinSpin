@@ -2887,20 +2887,28 @@ input:checked + .slider:before {
 }
 
 /* ============================================================
-   CARD SIGNATURE — "Genspin by Rom" (Pixelify Sans only)
+   CARD WATERMARK — "Genspin by Rom" (Pixelify Sans only)
    ============================================================ */
 .card-signature {
   font-family: var(--font-signature);
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: rgba(216, 179, 106, 0.45);
-  text-align: center;
-  margin-top: auto;
-  padding-top: 10px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: rgba(216, 179, 106, 0.38);
   user-select: none;
   pointer-events: none;
   line-height: 1;
+  position: absolute;
+  top: 14px;
+  right: 56px; /* offset right to avoid the X close button */
+  z-index: 10;
+  white-space: nowrap;
+}
+
+/* On result cards (no X button in top-right), pull back to corner */
+.result-card-container .card-signature {
+  right: 14px;
+  top: 12px;
 }
 
 /* ============================================================
@@ -2960,4 +2968,14 @@ input:checked + .slider:before {
 .custom-time-apply:hover {
   background: rgba(216, 179, 106, 0.22);
   border-color: rgba(216, 179, 106, 0.6);
+}
+
+.bg-error-msg {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 60, 60, 0.1);
+  border: 1px solid rgba(255, 60, 60, 0.3);
+  color: #ff8080;
+  font-size: 0.72rem;
+  line-height: 1.4;
 }

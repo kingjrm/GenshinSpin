@@ -10,6 +10,9 @@ interface SpinHistoryProps {
 }
 
 export default function SpinHistory({ history, onClearHistory }: SpinHistoryProps) {
+  // Show last 10 spins, most recent first; index = spin number in session
+  const displayed = history.slice(0, 10);
+
   return (
     <div className="glass-panel history-panel p-5 flex flex-col w-full h-full">
       <div className="history-header">
@@ -18,10 +21,7 @@ export default function SpinHistory({ history, onClearHistory }: SpinHistoryProp
           <p className="history-subtitle">Session Records</p>
         </div>
         {history.length > 0 && (
-          <button
-            onClick={onClearHistory}
-            className="history-clear-btn"
-          >
+          <button onClick={onClearHistory} className="history-clear-btn">
             Clear
           </button>
         )}
@@ -29,24 +29,25 @@ export default function SpinHistory({ history, onClearHistory }: SpinHistoryProp
 
       {history.length === 0 ? (
         <div className="history-empty-state">
-          <span className="history-empty-icon">📜</span>
+          <span className="history-empty-icon" style={{ fontFamily: "var(--font-header)", fontSize: "1.5rem", color: "var(--text-gold)", opacity: 0.4 }}>&#9654;</span>
           <p className="history-empty-title">No spins recorded yet.</p>
           <p className="history-empty-text">Launch the wheel to see your records here.</p>
         </div>
       ) : (
         <div className="history-list overflow-y-auto max-h-[300px] pr-1">
-          {history.slice(0, 10).map((char, index) => {
-            const displayIndex = String(history.length - index).padStart(2, "0");
-            
+          {displayed.map((char, index) => {
+            // Spin #1 = most recent, counting up from newest
+            const spinNumber = String(index + 1).padStart(2, "0");
+
             const elementColors: Record<string, string> = {
-              Pyro: "var(--color-pyro)",
-              Hydro: "var(--color-hydro)",
-              Cryo: "var(--color-cryo)",
+              Pyro:    "var(--color-pyro)",
+              Hydro:   "var(--color-hydro)",
+              Cryo:    "var(--color-cryo)",
               Electro: "var(--color-electro)",
-              Dendro: "var(--color-dendro)",
-              Anemo: "var(--color-anemo)",
-              Geo: "var(--color-geo)",
-              None: "var(--color-none)",
+              Dendro:  "var(--color-dendro)",
+              Anemo:   "var(--color-anemo)",
+              Geo:     "var(--color-geo)",
+              None:    "var(--color-none)",
             };
 
             const elementColor = elementColors[char.element] || "var(--color-none)";
@@ -57,9 +58,7 @@ export default function SpinHistory({ history, onClearHistory }: SpinHistoryProp
                 className="history-item"
               >
                 <div className="history-left">
-                  <span className="history-index">
-                    {displayIndex}
-                  </span>
+                  <span className="history-index">{spinNumber}</span>
                   <CharacterImage
                     name={char.name}
                     src={char.image}
@@ -80,12 +79,17 @@ export default function SpinHistory({ history, onClearHistory }: SpinHistoryProp
                     {char.region !== "None" ? char.region : "Lore"}
                   </span>
                   <span className="history-rarity">
-                    {char.rarity}★
+                    {char.rarity}&#9733;
                   </span>
                 </div>
               </div>
             );
           })}
+          {history.length > 10 && (
+            <p style={{ textAlign: "center", fontSize: "0.65rem", color: "var(--text-muted)", padding: "8px 0" }}>
+              +{history.length - 10} more (showing last 10)
+            </p>
+          )}
         </div>
       )}
     </div>

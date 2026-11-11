@@ -70,6 +70,13 @@ export default function Home() {
     setBossTimeLimit(times[Math.floor(Math.random() * times.length)]);
   }, []);
 
+  // Trigger boss battle overlay once team is full
+  React.useEffect(() => {
+    if (history.length > 0 && history.length === teamSize) {
+      setShowBossBattleOverlay(true);
+    }
+  }, [history.length, teamSize]);
+
   // Auto-pick rules whenever a boss is selected
   React.useEffect(() => {
     if (selectedBoss !== null) {
@@ -181,17 +188,11 @@ export default function Home() {
     });
   }, []);
 
-  // Spin complete handler
+  // Spin complete handler — NOTE: never call setState inside another setState's updater
   const handleSpinComplete = useCallback(
     (character: Character) => {
       setResult(character);
-      setHistory((prev) => {
-        const next = [character, ...prev];
-        if (next.length === teamSize) {
-          setShowBossBattleOverlay(true);
-        }
-        return next;
-      });
+      setHistory((prev) => [character, ...prev]);
       if (removeAfterSpin) {
         handleRemoveCharacter(character.name);
       }
@@ -489,6 +490,9 @@ export default function Home() {
               ✕
             </button>
 
+            {/* Watermark */}
+            <div className="card-signature">Genspin by Rom</div>
+
             <div className="boss-battle-header-container">
               <h2 className="boss-title-header">BOSS BATTLE</h2>
               <div className="boss-divider" />
@@ -589,8 +593,14 @@ export default function Home() {
                     <button
                       className="custom-time-apply"
                       onClick={() => {
-                        const totalSec = (parseInt(customTimeMin || "0") * 60) + parseInt(customTimeSec || "0");
-                        if (totalSec > 0) setBossTimeLimit(totalSec);
+                        const mins = Math.max(0, parseInt(customTimeMin || "0") || 0);
+                        const secs = Math.min(59, Math.max(0, parseInt(customTimeSec || "0") || 0));
+                        const totalSec = mins * 60 + secs;
+                        if (totalSec > 0) {
+                          setBossTimeLimit(totalSec);
+                          setCustomTimeMin("");
+                          setCustomTimeSec("");
+                        }
                       }}
                     >
                       Set
@@ -677,7 +687,6 @@ export default function Home() {
                   </button>
                 </div>
 
-                <div className="card-signature">Genspin by Rom</div>
               </div>
             )}
           </div>

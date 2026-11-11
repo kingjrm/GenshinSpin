@@ -60,6 +60,9 @@ export default function BossResultCard({
         }}
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking card itself
       >
+        {/* Watermark */}
+        <div className="card-signature">Genspin by Rom</div>
+
         {/* Header */}
         <div className="flex flex-col gap-1">
           <span className="text-xs uppercase tracking-[0.25em] text-gold font-bold">Challenge Awaits</span>
@@ -112,9 +115,6 @@ export default function BossResultCard({
             Acknowledge Challenge
           </button>
         </div>
-
-        {/* Signature */}
-        <div className="card-signature">Genspin by Rom</div>
       </div>
     </div>
   );

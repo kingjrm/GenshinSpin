@@ -11,6 +11,7 @@ interface BgSettings {
 }
 
 const LS_KEY = "genspin-bg";
+const MAX_FILE_MB = 8; // max base64 image size to store
 
 const DEFAULT: BgSettings = {
   imageDataUrl: undefined,
@@ -25,16 +26,31 @@ function loadSettings(): BgSettings {
   try {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return DEFAULT;
-    return { ...DEFAULT, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    // Validate parsed values are within expected ranges
+    return {
+      imageDataUrl: typeof parsed.imageDataUrl === "string" ? parsed.imageDataUrl : undefined,
+      imageUrl: typeof parsed.imageUrl === "string" ? parsed.imageUrl : undefined,
+      opacity: typeof parsed.opacity === "number" && parsed.opacity >= 10 && parsed.opacity <= 100 ? parsed.opacity : DEFAULT.opacity,
+      blur: typeof parsed.blur === "number" && parsed.blur >= 0 && parsed.blur <= 20 ? parsed.blur : DEFAULT.blur,
+      brightness: typeof parsed.brightness === "number" && parsed.brightness >= 20 && parsed.brightness <= 150 ? parsed.brightness : DEFAULT.brightness,
+    };
   } catch {
     return DEFAULT;
   }
 }
 
-function saveSettings(s: BgSettings) {
+function saveSettings(s: BgSettings): string | null {
+  // Return error message or null on success
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(s));
-  } catch {}
+    return null;
+  } catch (e) {
+    if (e instanceof DOMException && (e.name === "QuotaExceededError" || e.name === "NS_ERROR_DOM_QUOTA_REACHED")) {
+      return "Image too large for browser storage. Try a smaller image or use a URL instead.";
+    }
+    return "Could not save settings.";
+  }
 }
 
 export default function BackgroundCustomizer() {
@@ -42,6 +58,7 @@ export default function BackgroundCustomizer() {
   const [settings, setSettings] = useState<BgSettings>(DEFAULT);
   const [urlInput, setUrlInput] = useState("");
   const [tab, setTab] = useState<"file" | "url">("file");
+  const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Load from localStorage on mount
@@ -52,9 +69,11 @@ export default function BackgroundCustomizer() {
   }, []);
 
   const update = useCallback((patch: Partial<BgSettings>) => {
+    setError(null);
     setSettings((prev) => {
       const next = { ...prev, ...patch };
-      saveSettings(next);
+      const err = saveSettings(next);
+      if (err) setError(err);
       return next;
     });
   }, []);
@@ -62,9 +81,23 @@ export default function BackgroundCustomizer() {
   const handleFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setError(null);
+
+    // Guard: reject files over MAX_FILE_MB MB
+    if (file.size > MAX_FILE_MB * 1024 * 1024) {
+      setError(`Image too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max ${MAX_FILE_MB} MB. Try a URL instead.`);
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+
     const reader = new FileReader();
+    reader.onerror = () => setError("Failed to read file. Please try again.");
     reader.onload = (ev) => {
       const dataUrl = ev.target?.result as string;
+      if (!dataUrl || !dataUrl.startsWith("data:image/")) {
+        setError("Invalid image file.");
+        return;
+      }
       update({ imageDataUrl: dataUrl, imageUrl: undefined });
       setUrlInput("");
     };
@@ -72,13 +105,27 @@ export default function BackgroundCustomizer() {
   }, [update]);
 
   const handleUrlApply = useCallback(() => {
-    if (!urlInput.trim()) return;
-    update({ imageUrl: urlInput.trim(), imageDataUrl: undefined });
+    const trimmed = urlInput.trim();
+    if (!trimmed) return;
+    // Basic URL validation
+    try {
+      const parsed = new URL(trimmed);
+      if (!["http:", "https:"].includes(parsed.protocol)) {
+        setError("Please enter a valid http/https URL.");
+        return;
+      }
+    } catch {
+      setError("Invalid URL format.");
+      return;
+    }
+    setError(null);
+    update({ imageUrl: trimmed, imageDataUrl: undefined });
   }, [urlInput, update]);
 
   const handleReset = useCallback(() => {
     if (fileRef.current) fileRef.current.value = "";
     setUrlInput("");
+    setError(null);
     setSettings(DEFAULT);
     saveSettings(DEFAULT);
   }, []);
@@ -109,7 +156,7 @@ export default function BackgroundCustomizer() {
       {/* Floating gear button */}
       <button
         className="bg-gear-btn"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => { setOpen((v) => !v); setError(null); }}
         title="Customize Background"
         aria-label="Customize Background"
       >
@@ -127,17 +174,24 @@ export default function BackgroundCustomizer() {
               <button className="bg-panel-close" onClick={() => setOpen(false)}>&#10005;</button>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <div className="bg-error-msg" role="alert">
+                &#9888; {error}
+              </div>
+            )}
+
             {/* Tab row */}
             <div className="bg-tab-row">
               <button
                 className={`bg-tab ${tab === "file" ? "active" : ""}`}
-                onClick={() => setTab("file")}
+                onClick={() => { setTab("file"); setError(null); }}
               >
                 Upload File
               </button>
               <button
                 className={`bg-tab ${tab === "url" ? "active" : ""}`}
-                onClick={() => setTab("url")}
+                onClick={() => { setTab("url"); setError(null); }}
               >
                 Image URL
               </button>
@@ -162,6 +216,7 @@ export default function BackgroundCustomizer() {
                   <div className="bg-upload-placeholder">
                     <span className="bg-upload-icon">&#8682;</span>
                     <span>Click to upload image</span>
+                    <span style={{ fontSize: "0.62rem", opacity: 0.5 }}>Max {MAX_FILE_MB} MB</span>
                   </div>
                 )}
               </div>
@@ -172,7 +227,7 @@ export default function BackgroundCustomizer() {
                   className="bg-url-input"
                   placeholder="https://example.com/image.jpg"
                   value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
+                  onChange={(e) => { setUrlInput(e.target.value); setError(null); }}
                   onKeyDown={(e) => e.key === "Enter" && handleUrlApply()}
                 />
                 <button className="bg-url-apply-btn" onClick={handleUrlApply}>Apply</button>

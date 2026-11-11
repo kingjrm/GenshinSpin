@@ -63,6 +63,9 @@ export default function ResultCard({
         }}
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking card itself
       >
+        {/* Watermark */}
+        <div className="card-signature">Genspin by Rom</div>
+
         {/* Sparkle Header */}
         <div className="flex flex-col gap-1">
           <span className="text-xs uppercase tracking-[0.25em] text-gold font-bold">Winner Reveal</span>
@@ -142,9 +145,6 @@ export default function ResultCard({
             </button>
           )}
         </div>
-
-        {/* Signature */}
-        <div className="card-signature">Genspin by Rom</div>
       </div>
     </div>
   );

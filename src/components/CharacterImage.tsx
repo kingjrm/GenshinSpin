@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface CharacterImageProps {
   name: string;
@@ -28,10 +28,16 @@ const RARITY_BORDER: Record<number, string> = {
   4: "#a256e3",
 };
 
-// Fallback CDN chain: enka.network → gi.yatta.moe → initials
 function getYattaFallback(name: string): string {
   const key = name.replace(/\s+/g, "");
   return `https://gi.yatta.moe/assets/UI/UI_AvatarIcon_${key}.png`;
+}
+
+function getInitials(n: string): string {
+  const parts = n.trim().split(/\s+/);
+  return parts.length >= 2
+    ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    : n.slice(0, 2).toUpperCase();
 }
 
 export default function CharacterImage({
@@ -42,43 +48,35 @@ export default function CharacterImage({
   className = "",
   size = 80,
 }: CharacterImageProps) {
-  const [triedFallback, setTriedFallback] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState<string>(src || "");
+  const [fallbackUsed, setFallbackUsed] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState(src);
 
-  // Reset when src prop changes (e.g. different character)
-  const prevSrc = React.useRef(src);
-  if (prevSrc.current !== src) {
-    prevSrc.current = src;
-    setTriedFallback(false);
+  // Reset state when src or name changes (different character selected)
+  useEffect(() => {
+    setCurrentSrc(src || "");
+    setFallbackUsed(false);
     setFailed(false);
-    setCurrentSrc(src);
-  }
+  }, [src, name]);
 
   const gradient = ELEMENT_GRADIENTS[element] || ELEMENT_GRADIENTS.None;
   const border   = RARITY_BORDER[rarity] ?? "#7c7f8a";
 
-  const getInitials = (n: string) => {
-    const parts = n.split(" ");
-    return parts.length >= 2
-      ? (parts[0][0] + parts[1][0]).toUpperCase()
-      : n.slice(0, 2).toUpperCase();
-  };
-
   const baseStyle: React.CSSProperties = {
-    width:  size,
-    height: size,
+    width:    size,
+    height:   size,
     minWidth: size,
     borderRadius: "50%",
-    border: `2.5px solid ${border}`,
+    border:   `2.5px solid ${border}`,
     overflow: "hidden",
-    display: "flex",
+    display:  "flex",
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
     boxShadow: `0 0 10px ${border}55, 0 4px 12px rgba(0,0,0,0.5)`,
   };
 
+  // Show initials tile if no src or all CDNs failed
   if (!currentSrc || failed) {
     return (
       <div
@@ -89,7 +87,7 @@ export default function CharacterImage({
         <span style={{
           fontSize: size * 0.33,
           fontWeight: 800,
-          color: element === "Cryo" || element === "Geo" ? "#111" : "#fff",
+          color: (element === "Cryo" || element === "Geo") ? "#111" : "#fff",
           fontFamily: "var(--font-header)",
           textShadow: "0 1px 4px rgba(0,0,0,0.6)",
           letterSpacing: "0.02em",
@@ -110,10 +108,12 @@ export default function CharacterImage({
         height={size}
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
         onError={() => {
-          if (!triedFallback) {
-            setTriedFallback(true);
+          if (!fallbackUsed) {
+            // Try yatta.moe as second CDN
+            setFallbackUsed(true);
             setCurrentSrc(getYattaFallback(name));
           } else {
+            // Both CDNs failed — show initials
             setFailed(true);
           }
         }}
