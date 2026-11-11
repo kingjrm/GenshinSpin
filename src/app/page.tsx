@@ -377,12 +377,6 @@ export default function Home() {
                     </label>
                   </div>
 
-                  <div className="reset-btn-container">
-                    <button onClick={handleResetWheel} className="master-reset-btn w-full">
-                      Reset Wheel State
-                    </button>
-                  </div>
-
                   {history.length >= teamSize && !showBossBattleOverlay && (
                     <div className="enter-boss-btn-container w-full">
                       <button
@@ -400,6 +394,16 @@ export default function Home() {
 
           {/* COLUMN 3: Spin History & Team Panel */}
           <aside className="sidebar-right">
+            {/* RESET — always visible at top of sidebar */}
+            <button
+              onClick={handleResetWheel}
+              className={`master-reset-btn sidebar-reset-btn${history.length > 0 ? " has-history" : ""}`}
+              disabled={isSpinning}
+              title="Reset all wheel state, history, and team"
+            >
+              &#8635; Reset Wheel
+            </button>
+
             <div className="glass-panel p-5 flex flex-col gap-3">
               <h3 className="text-xs uppercase tracking-wider text-muted font-bold">Active Pool Stats</h3>
               <div className="stats-grid">
