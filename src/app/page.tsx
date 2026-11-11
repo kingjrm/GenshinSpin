@@ -16,6 +16,7 @@ import CharacterImage from "@/components/CharacterImage";
 import BackgroundCustomizer from "@/components/BackgroundCustomizer";
 import BossTimer from "@/components/BossTimer";
 import "./page.css";
+import "./mobile.css";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);

@@ -1,0 +1,201 @@
+/* =================================================================
+   GENSPIN — MOBILE RESPONSIVE STYLES
+   Breakpoints:
+     ≤ 900px  : tablet / small landscape
+     ≤ 600px  : phones (portrait)
+     ≤ 400px  : tiny phones
+   ================================================================= */
+
+/* ---- 900px: start collapsing the 3-col grid ---- */
+@media (max-width: 900px) {
+  .app-container {
+    padding: 10px 10px 24px;
+    gap: 16px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "center"
+      "left"
+      "right";
+    gap: 14px;
+  }
+
+  .center-area {
+    grid-area: center;
+    min-height: auto;
+    gap: 12px;
+  }
+
+  .sidebar-left  { grid-area: left; }
+  .sidebar-right { grid-area: right; }
+
+  /* Header shrinks sooner */
+  .header-section h1 { font-size: clamp(1.5rem, 5vw, 2.2rem); }
+}
+
+/* ---- 600px: full phone portrait treatment ---- */
+@media (max-width: 600px) {
+
+  /* ── Global ── */
+  .app-container {
+    padding: 8px 8px 20px;
+    gap: 12px;
+  }
+
+  /* ── Promo bar ── */
+  .promo-bar { border-radius: 12px; }
+  .promo-bar-track { animation-duration: 12s; padding: 8px 12px; gap: 10px; }
+  .promo-pill { font-size: 0.72rem; padding: 4px 10px; }
+
+  /* ── Header ── */
+  .header-section { padding: 2px 2px 0; gap: 6px; }
+  .header-section h1 { font-size: clamp(1.3rem, 7vw, 1.8rem); }
+  .header-section p  { font-size: 0.82rem; }
+  .header-divider    { width: min(160px, 80%); }
+
+  /* ── Glass panels ── */
+  .glass-panel { border-radius: 16px !important; }
+
+  /* ── Dashboard grid ── */
+  .dashboard-grid {
+    gap: 10px;
+  }
+
+  /* ── Center: Wheel area ── */
+  .center-area { gap: 10px; }
+
+  .wheel-centerpiece { padding: 8px; border-radius: 18px; }
+
+  /* Wheel canvas scales via max-width:100% already */
+  canvas { max-width: 100% !important; height: auto !important; }
+
+  /* Spin button */
+  .wheel-spin-btn { width: 70px !important; height: 70px !important; }
+  .wheel-spin-btn-title   { font-size: 10px !important; letter-spacing: 0.14em; }
+  .wheel-spin-btn-subtitle{ font-size: 7px  !important; letter-spacing: 0.1em; }
+
+  /* Roster + TeamSize row: stack on very small */
+  .roster-teamsize-row { flex-direction: column; gap: 8px; }
+  .team-size-inline    { width: 100%; justify-content: center; padding: 10px 12px !important; }
+  .manage-roster-btn   { width: 100%; }
+
+  /* Toggle card */
+  .toggle-card { padding: 11px 14px; border-radius: 14px; }
+  .toggle-title { font-size: 0.78rem; }
+  .toggle-desc  { font-size: 0.68rem; }
+
+  /* Reset button */
+  .sidebar-reset-btn { font-size: 0.72rem; padding: 9px 12px; border-radius: 12px; }
+
+  /* Enter boss battle */
+  .enter-boss-battle-btn { font-size: 0.78rem; padding: 11px 16px; }
+
+  /* ── Sidebar right: Stats + Team + History ── */
+  .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .stat-item  { padding: 8px 6px; border-radius: 10px; }
+
+  /* ── Spin History ── */
+  .history-panel { gap: 10px; }
+  .history-item  { padding: 8px 10px; border-radius: 12px; }
+  .history-name  { font-size: 0.75rem; }
+
+  /* ── Filter panel ── */
+  .filter-element-grid { grid-template-columns: repeat(4, 1fr); }
+  .filter-element-btn  { padding: 5px 3px; font-size: 0.58rem; }
+
+  /* ── Character Pool ── */
+  .pool-header { gap: 8px; margin-bottom: 12px; }
+
+  /* ── Result Card Modal ── */
+  .result-card-container {
+    max-width: 92vw;
+    padding: 18px 14px;
+    gap: 14px;
+    border-radius: 18px;
+  }
+
+  /* ── Boss Battle Overlay ── */
+  .boss-battle-overlay { padding: 10px 8px; }
+
+  .boss-battle-section {
+    max-width: 100%;
+    padding: 16px 12px 20px;
+    border-radius: 20px;
+    max-height: 95vh;
+  }
+
+  .boss-title-header { font-size: clamp(1.2rem, 6vw, 1.7rem); letter-spacing: 0.14em; margin-bottom: 8px; }
+
+  .boss-battle-header-container { margin-bottom: 14px; }
+
+  /* Weapon + time badges row: wrap nicely */
+  .boss-rules-row { flex-wrap: wrap; gap: 6px; justify-content: center; }
+
+  /* Boss setup section */
+  .boss-setup { padding: 14px 8px; gap: 12px; }
+  .boss-type-buttons { gap: 8px; }
+  .boss-type-btn { padding: 10px 12px; font-size: 0.75rem; border-radius: 12px; }
+
+  /* Matchup grid stacks */
+  .matchup-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+  .matchup-vs { width: 52px !important; height: 52px !important; margin: 0 auto; }
+  .matchup-vs-text { font-size: 1.1rem !important; }
+  .matchup-team-portraits { flex-wrap: wrap; justify-content: center; }
+
+  /* Boss action buttons */
+  .boss-action-btn { padding: 12px 14px; font-size: 0.78rem; }
+
+  /* BossTimer */
+  .boss-timer-display { font-size: clamp(2.2rem, 10vw, 3rem) !important; }
+
+  /* Boss result card */
+  .boss-result-card { padding: 16px 12px; border-radius: 18px; }
+
+  /* Roster modal on mobile */
+  .rm-panel { max-height: 95vh; border-radius: 18px; }
+  .rm-grid  { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; padding: 10px 12px 14px; }
+  .rm-card  { min-height: 110px; border-radius: 12px; }
+  .rm-header   { padding: 14px 14px 12px; }
+  .rm-controls { padding: 10px 14px 8px; flex-wrap: wrap; gap: 6px; }
+
+  /* Team portrait grid: 2→4 cols on small screens for compact display */
+  .team-portrait-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .team-portrait-name { font-size: 0.58rem; max-width: 54px; }
+
+  /* Background customizer panel doesn't cover badly */
+  .bg-panel { width: min(94vw, 300px) !important; right: 8px !important; }
+
+  /* Watermark: scale down slightly */
+  .card-signature { font-size: 0.65rem !important; }
+
+  /* Boss timer buttons */
+  .boss-timer-btn { padding: 6px 14px !important; font-size: 0.72rem !important; }
+}
+
+/* ---- 400px: tiny phones (iPhone SE, Galaxy A series) ---- */
+@media (max-width: 400px) {
+  .app-container { padding: 6px 6px 16px; }
+
+  .header-section h1 { font-size: 1.25rem; }
+
+  .wheel-spin-btn { width: 62px !important; height: 62px !important; }
+
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .team-portrait-grid { grid-template-columns: repeat(3, 1fr); }
+
+  .boss-title-header { font-size: 1.15rem; letter-spacing: 0.1em; }
+
+  .rm-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
+
+  /* Result card: prevent padding crush */
+  .result-card-container { padding: 14px 10px; gap: 10px; }
+
+  /* History: tighten further */
+  .history-item { gap: 8px; padding: 7px 8px; }
+}
