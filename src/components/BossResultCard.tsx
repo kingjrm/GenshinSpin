@@ -2,17 +2,23 @@
 
 import React from "react";
 import { createPortal } from "react-dom";
-import { Boss, getRegionElement } from "@/data/bosses";
+import { Boss } from "@/data/bosses";
 import BossImage from "./BossImage";
 
 interface BossResultCardProps {
   boss: Boss | null;
   onClose: () => void;
+  challengerName: string;
+  onChallengerNameChange: (name: string) => void;
+  challengeDateTime: string;
 }
 
 export default function BossResultCard({
   boss,
   onClose,
+  challengerName,
+  onChallengerNameChange,
+  challengeDateTime,
 }: BossResultCardProps) {
   if (!boss) return null;
 
@@ -104,6 +110,31 @@ export default function BossResultCard({
               </span>
             )}
           </div>
+        </div>
+
+        <div className="boss-challenger-form">
+          <label htmlFor="challenger-name" className="boss-challenger-label">
+            Challenger
+          </label>
+          <input
+            id="challenger-name"
+            type="text"
+            value={challengerName}
+            onChange={(event) => onChallengerNameChange(event.target.value)}
+            placeholder="Enter challenger name"
+            className="boss-challenger-input"
+            autoFocus
+          />
+          <label htmlFor="challenge-date-time" className="boss-challenger-label">
+            Date &amp; time
+          </label>
+          <input
+            id="challenge-date-time"
+            type="datetime-local"
+            value={challengeDateTime}
+            readOnly
+            className="boss-challenger-input"
+          />
         </div>
 
         {/* Actions */}

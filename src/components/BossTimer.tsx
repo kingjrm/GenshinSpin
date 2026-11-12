@@ -5,78 +5,94 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 interface BossTimerProps {
   seconds: number;
   onExpire?: () => void;
+  onStop?: () => void;
+  onReset?: () => void;
+  onComplete?: (elapsedMilliseconds: number) => void;
 }
 
-export default function BossTimer({ seconds, onExpire }: BossTimerProps) {
-  // Guard: clamp to at least 1 to avoid division-by-zero
-  const totalSeconds = Math.max(1, Math.round(seconds));
+export default function BossTimer({ seconds, onExpire, onStop, onReset, onComplete }: BossTimerProps) {
+  const totalMilliseconds = Math.max(1000, Math.round(seconds * 1000));
 
-  const [remaining, setRemaining] = useState(totalSeconds);
+  const [remaining, setRemaining] = useState(totalMilliseconds);
   const [running, setRunning] = useState(false);
   const [expired, setExpired] = useState(false);
+  const [stopped, setStopped] = useState(false);
 
-  // Use a ref for the interval so cleanup is always stable
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // Track "should expire" in a ref to decouple from setState inside interval
-  const shouldExpireRef = useRef(false);
+  const animationFrameRef = useRef<number | null>(null);
+  const lastTickRef = useRef<number | null>(null);
+  const remainingRef = useRef(totalMilliseconds);
+  const onExpireRef = useRef(onExpire);
+  const onStopRef = useRef(onStop);
+  const onResetRef = useRef(onReset);
+  const onCompleteRef = useRef(onComplete);
 
-  // Reset everything when the totalSeconds prop changes
   useEffect(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    setRemaining(totalSeconds);
-    setRunning(false);
-    setExpired(false);
-    shouldExpireRef.current = false;
-  }, [totalSeconds]);
+    onExpireRef.current = onExpire;
+    onStopRef.current = onStop;
+    onResetRef.current = onReset;
+    onCompleteRef.current = onComplete;
+  }, [onComplete, onExpire, onReset, onStop]);
 
-  // Tick effect — only depends on `running`
   useEffect(() => {
     if (!running) return;
 
-    intervalRef.current = setInterval(() => {
-      setRemaining((prev) => {
-        const next = prev - 1;
-        if (next <= 0) {
-          shouldExpireRef.current = true;
-          return 0;
-        }
-        return next;
-      });
-    }, 1000);
+    const tick = (now: number) => {
+      if (lastTickRef.current === null) lastTickRef.current = now;
+      const elapsed = now - lastTickRef.current;
+      lastTickRef.current = now;
 
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      remainingRef.current = Math.max(0, remainingRef.current - elapsed);
+      setRemaining(remainingRef.current);
+      if (remainingRef.current === 0) {
+        setRunning(false);
+        setExpired(true);
+        onCompleteRef.current?.(totalMilliseconds - remainingRef.current);
+        onExpireRef.current?.();
+        return;
+      }
+
+      animationFrameRef.current = requestAnimationFrame(tick);
     };
-  }, [running]);
 
-  // Watch remaining to trigger expiry outside the setState updater
-  useEffect(() => {
-    if (shouldExpireRef.current && remaining === 0) {
-      shouldExpireRef.current = false;
-      setRunning(false);
-      setExpired(true);
-      onExpire?.();
-    }
-  }, [remaining, onExpire]);
+    animationFrameRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
+      lastTickRef.current = null;
+    };
+  }, [running, totalMilliseconds]);
 
   const handleReset = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    shouldExpireRef.current = false;
-    setRemaining(totalSeconds);
+    if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
+    remainingRef.current = totalMilliseconds;
+    setRemaining(totalMilliseconds);
     setRunning(false);
     setExpired(false);
-  }, [totalSeconds]);
+    setStopped(false);
+    lastTickRef.current = null;
+    onResetRef.current?.();
+  }, [totalMilliseconds]);
 
-  const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
-  const ss = String(remaining % 60).padStart(2, "0");
+  const handleStop = () => {
+    if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
+    setRunning(false);
+    setStopped(true);
+    lastTickRef.current = null;
+    onCompleteRef.current?.(totalMilliseconds - remainingRef.current);
+    onStopRef.current?.();
+  };
 
-  const pct = totalSeconds > 0 ? remaining / totalSeconds : 0;
+  const remainingSeconds = remaining / 1000;
+  const mm = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
+  const ss = String(Math.floor(remainingSeconds % 60)).padStart(2, "0");
+  const ms = String(Math.floor(remaining % 1000)).padStart(3, "0");
+
+  const pct = totalMilliseconds > 0 ? remaining / totalMilliseconds : 0;
   const color = pct > 0.5 ? "var(--text-gold)" : pct > 0.25 ? "#ff9933" : "#ff4444";
 
   return (
     <div className={`boss-timer ${expired ? "expired" : ""}`}>
       <div className="boss-timer-display" style={{ color: expired ? "#ff4444" : color }}>
-        {expired ? "TIME'S UP!" : `${mm}:${ss}`}
+        {expired ? "TIME'S UP!" : `${mm}:${ss}.${ms}`}
       </div>
       <div className="boss-timer-bar-track">
         <div
@@ -88,14 +104,14 @@ export default function BossTimer({ seconds, onExpire }: BossTimerProps) {
         />
       </div>
       <div className="boss-timer-actions">
-        {!running && !expired && (
+        {!running && !expired && !stopped && (
           <button className="boss-timer-btn start" onClick={() => setRunning(true)}>
             &#9654; Start
           </button>
         )}
         {running && (
-          <button className="boss-timer-btn pause" onClick={() => setRunning(false)}>
-            &#9646;&#9646; Pause
+          <button className="boss-timer-btn stop" onClick={handleStop}>
+            &#9632; Stop
           </button>
         )}
         <button className="boss-timer-btn reset" onClick={handleReset}>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
@@ -11,12 +11,18 @@ import CharacterPool from "@/components/CharacterPool";
 import RosterModal from "@/components/RosterModal";
 import ResultCard from "@/components/ResultCard";
 import BossResultCard from "@/components/BossResultCard";
-import SpinHistory from "@/components/SpinHistory";
+import SpinHistory, { BossBattleRecord } from "@/components/SpinHistory";
 import CharacterImage from "@/components/CharacterImage";
 import BackgroundCustomizer from "@/components/BackgroundCustomizer";
 import BossTimer from "@/components/BossTimer";
 import "./page.css";
 import "./mobile.css";
+
+const getLocalDateTimeValue = () => {
+  const now = new Date();
+  const offset = now.getTimezoneOffset() * 60000;
+  return new Date(now.getTime() - offset).toISOString().slice(0, 16);
+};
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -35,6 +41,8 @@ export default function Home() {
   const [teamSize, setTeamSize] = useState<1 | 2 | 3 | 4>(4);
   const [result, setResult] = useState<Character | null>(null);
   const [history, setHistory] = useState<Character[]>([]);
+  const [team, setTeam] = useState<Character[]>([]);
+  const [bossBattles, setBossBattles] = useState<BossBattleRecord[]>([]);
   const [removeAfterSpin, setRemoveAfterSpin] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
 
@@ -44,6 +52,11 @@ export default function Home() {
   const [isBossSpinning, setIsBossSpinning] = useState(false);
   const [showBossResult, setShowBossResult] = useState(false);
   const [showBossBattleOverlay, setShowBossBattleOverlay] = useState(false);
+  const [challengerName, setChallengerName] = useState("");
+  const [challengeDateTime, setChallengeDateTime] = useState("");
+  const [isChallengeTimerComplete, setIsChallengeTimerComplete] = useState(false);
+  const [challengeElapsedMilliseconds, setChallengeElapsedMilliseconds] = useState(0);
+  const [showChallengerEditor, setShowChallengerEditor] = useState(false);
 
   // Optional boss rules
   const [bossTimeLimit, setBossTimeLimit] = useState<number | null>(null);
@@ -60,8 +73,8 @@ export default function Home() {
   }, [bossType]);
 
   const teamCharacters = useMemo(() => {
-    return history.slice(0, teamSize);
-  }, [history, teamSize]);
+    return team.slice(0, teamSize);
+  }, [team, teamSize]);
 
   // Helper: randomly pick weapon req and time limit
   const pickRules = React.useCallback(() => {
@@ -73,10 +86,10 @@ export default function Home() {
 
   // Trigger boss battle overlay once team is full
   React.useEffect(() => {
-    if (history.length > 0 && history.length === teamSize) {
+    if (team.length > 0 && team.length === teamSize) {
       setShowBossBattleOverlay(true);
     }
-  }, [history.length, teamSize]);
+  }, [team.length, teamSize]);
 
   // Auto-pick rules whenever a boss is selected
   React.useEffect(() => {
@@ -194,6 +207,7 @@ export default function Home() {
     (character: Character) => {
       setResult(character);
       setHistory((prev) => [character, ...prev]);
+      setTeam((prev) => prev.length < teamSize ? [...prev, character] : prev);
       if (removeAfterSpin) {
         handleRemoveCharacter(character.name);
       }
@@ -204,15 +218,58 @@ export default function Home() {
   // Clear spin history list
   const handleClearHistory = useCallback(() => {
     setHistory([]);
+    setBossBattles([]);
+    setTeam([]);
   }, []);
+
+  const handleSuccessfulChallenge = useCallback(() => {
+    if (!selectedBoss || !challengerName.trim() || !isChallengeTimerComplete) return;
+
+    setBossBattles((prev) => [{
+      boss: selectedBoss,
+      challengerName: challengerName.trim(),
+      dateTime: challengeDateTime,
+      outcome: "won",
+      team: teamCharacters,
+      elapsedMilliseconds: challengeElapsedMilliseconds,
+    }, ...prev]);
+    setTeam([]);
+    setBossType(null);
+    setSelectedBoss(null);
+    setShowBossResult(false);
+    setShowBossBattleOverlay(false);
+    setIsChallengeTimerComplete(false);
+    setChallengerName("");
+    setShowChallengerEditor(false);
+  }, [challengeDateTime, challengeElapsedMilliseconds, challengerName, isChallengeTimerComplete, selectedBoss, teamCharacters]);
+
+  const handleFailedChallenge = useCallback(() => {
+    if (!selectedBoss || !challengerName.trim() || !isChallengeTimerComplete) return;
+    setBossBattles((prev) => [{
+      boss: selectedBoss,
+      challengerName: challengerName.trim(),
+      dateTime: challengeDateTime,
+      outcome: "lost",
+      team: teamCharacters,
+      elapsedMilliseconds: challengeElapsedMilliseconds,
+    }, ...prev]);
+    setTeam([]);
+    setBossType(null);
+    setSelectedBoss(null);
+    setShowBossResult(false);
+    setShowBossBattleOverlay(false);
+    setIsChallengeTimerComplete(false);
+    setChallengerName("");
+    setShowChallengerEditor(false);
+  }, [challengeDateTime, challengeElapsedMilliseconds, challengerName, isChallengeTimerComplete, selectedBoss, teamCharacters]);
 
   // Global reset wheel
   const handleResetWheel = useCallback(() => {
     setSelectedNames(new Set(charactersData.map((c) => c.name)));
     handleResetFilters();
     setResult(null);
-    setHistory([]);
     setRemoveAfterSpin(true);
+    setTeam([]);
     setShowRosterModal(false);
     // Reset boss states
     setBossType(null);
@@ -220,6 +277,11 @@ export default function Home() {
     setIsBossSpinning(false);
     setShowBossResult(false);
     setShowBossBattleOverlay(false);
+    setChallengerName("");
+    setChallengeDateTime("");
+    setIsChallengeTimerComplete(false);
+    setChallengeElapsedMilliseconds(0);
+    setShowChallengerEditor(false);
     setBossTimeLimit(null);
     setWeaponReq("any");
   }, [handleResetFilters]);
@@ -345,13 +407,13 @@ export default function Home() {
                     <div className="team-size-inline glass-panel">
                       <div className="team-size-label-col">
                         <span className="team-size-label">Team</span>
-                        <span className="team-size-progress">{history.length}/{teamSize}</span>
+                        <span className="team-size-progress">{team.length}/{teamSize}</span>
                       </div>
                       <div className="team-size-buttons-inline">
                         {([1, 2, 3, 4] as const).map((n) => (
                           <button
                             key={n}
-                            onClick={() => { setTeamSize(n); setHistory([]); setBossType(null); setSelectedBoss(null); setShowBossBattleOverlay(false); }}
+                            onClick={() => { setTeamSize(n); setTeam([]); setBossType(null); setSelectedBoss(null); setShowBossBattleOverlay(false); }}
                             className={`team-size-btn ${teamSize === n ? "active" : ""}`}
                             disabled={isSpinning}
                           >
@@ -378,7 +440,7 @@ export default function Home() {
                     </label>
                   </div>
 
-                  {history.length >= teamSize && !showBossBattleOverlay && (
+                  {team.length >= teamSize && !showBossBattleOverlay && (
                     <div className="enter-boss-btn-container w-full">
                       <button
                         onClick={() => setShowBossBattleOverlay(true)}
@@ -400,7 +462,7 @@ export default function Home() {
               onClick={handleResetWheel}
               className={`master-reset-btn sidebar-reset-btn${history.length > 0 ? " has-history" : ""}`}
               disabled={isSpinning}
-              title="Reset all wheel state, history, and team"
+              title="Reset wheel settings and active team; keep spin history"
             >
               &#8635; Reset Wheel
             </button>
@@ -432,13 +494,13 @@ export default function Home() {
             </div>
 
             {/* CURRENT TEAM */}
-            {history.length > 0 && (
+            {team.length > 0 && (
               <div className="glass-panel p-5 flex flex-col gap-3">
                 <h3 className="text-xs uppercase tracking-wider text-muted font-bold">
-                  Your Team ({Math.min(history.length, teamSize)}/{teamSize})
+                  Your Team ({Math.min(team.length, teamSize)}/{teamSize})
                 </h3>
                 <div className="team-portrait-grid">
-                  {history.slice(0, teamSize).map((char, idx) => (
+                  {team.slice(0, teamSize).map((char, idx) => (
                     <div key={`${char.name}-${idx}`} className="team-portrait-item">
                       <div className="relative">
                         <CharacterImage
@@ -452,7 +514,7 @@ export default function Home() {
                           className="team-remove-btn"
                           title={`Remove ${char.name} from team`}
                           onClick={() => {
-                            setHistory((prev) => prev.filter((_, i) => i !== idx));
+                            setTeam((prev) => prev.filter((_, i) => i !== idx));
                           }}
                         >
                           ✕
@@ -465,7 +527,7 @@ export default function Home() {
               </div>
             )}
 
-            <SpinHistory history={history} onClearHistory={handleClearHistory} />
+            <SpinHistory history={history} bossBattles={bossBattles} onClearHistory={handleClearHistory} />
           </aside>
         </div>
 
@@ -484,7 +546,7 @@ export default function Home() {
       )}
 
       {/* BOSS BATTLE OVERLAY */}
-      {showBossBattleOverlay && history.length >= teamSize && typeof document !== "undefined" && createPortal(
+      {showBossBattleOverlay && team.length >= teamSize && typeof document !== "undefined" && createPortal(
         <div className="boss-battle-overlay" onClick={() => setShowBossBattleOverlay(false)}>
           <div className="boss-battle-section glass-panel" onClick={(e) => e.stopPropagation()}>
             <button
@@ -536,6 +598,11 @@ export default function Home() {
                   activeBosses={activeBosses}
                   onSpinComplete={(boss) => {
                     setSelectedBoss(boss);
+                    setChallengerName("");
+                    setChallengeDateTime(getLocalDateTimeValue());
+                    setIsChallengeTimerComplete(false);
+                    setChallengeElapsedMilliseconds(0);
+                    setShowChallengerEditor(false);
                     setShowBossResult(true);
                   }}
                   isSpinning={isBossSpinning}
@@ -623,7 +690,14 @@ export default function Home() {
 
                 {/* Timer display — always shown in matchup, bossTimeLimit is auto-picked */}
                 {bossTimeLimit !== null && (
-                  <BossTimer key={bossTimeLimit} seconds={bossTimeLimit} />
+                  <BossTimer
+                    key={bossTimeLimit}
+                    seconds={bossTimeLimit}
+                    onExpire={() => setIsChallengeTimerComplete(true)}
+                    onStop={() => setIsChallengeTimerComplete(true)}
+                    onReset={() => setIsChallengeTimerComplete(false)}
+                    onComplete={setChallengeElapsedMilliseconds}
+                  />
                 )}
 
 
@@ -645,7 +719,7 @@ export default function Home() {
                             <button
                               className="team-remove-btn"
                               title={`Remove ${char.name}`}
-                              onClick={() => setHistory((prev) => prev.filter((_, i) => i !== idx))}
+                              onClick={() => setTeam((prev) => prev.filter((_, i) => i !== idx))}
                             >
                               &#10005;
                             </button>
@@ -664,6 +738,26 @@ export default function Home() {
                   {/* BOSS */}
                   <div className="matchup-boss-card glass-panel-inner">
                     <h3 className="matchup-card-title">BOSS</h3>
+                    <div className={`boss-challenger-editor${showChallengerEditor ? " open" : ""}`}>
+                      <button
+                        className="boss-challenger-toggle"
+                        onClick={() => setShowChallengerEditor((open) => !open)}
+                        type="button"
+                      >
+                        &#9998; Name
+                      </button>
+                      <div className="boss-challenger-inline">
+                        <label htmlFor="battle-challenger-name">Challenger</label>
+                        <input
+                          id="battle-challenger-name"
+                          type="text"
+                          value={challengerName}
+                          onChange={(event) => setChallengerName(event.target.value)}
+                          placeholder="Enter name"
+                        />
+                        <span>{challengeDateTime ? new Date(challengeDateTime).toLocaleString() : "--"}</span>
+                      </div>
+                    </div>
                     <div className="matchup-boss-content">
                       <CharacterImage
                         name={selectedBoss.name}
@@ -684,16 +778,52 @@ export default function Home() {
                 </div>
 
                 <div className="matchup-actions">
-                  <button onClick={handleSpinAgainBoss} className="boss-action-btn spin-again-btn">
-                    SPIN AGAIN
-                  </button>
-                  <button onClick={handleResetWheel} className="boss-action-btn new-team-btn">
-                    NEW TEAM
-                  </button>
+                  <div className="matchup-action-buttons">
+                    <button onClick={handleSpinAgainBoss} className="boss-action-btn spin-again-btn">
+                      SPIN AGAIN
+                    </button>
+                    <button onClick={handleResetWheel} className="boss-action-btn new-team-btn">
+                      NEW TEAM
+                    </button>
+                  </div>
                 </div>
 
               </div>
             )}
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {isChallengeTimerComplete && selectedBoss && typeof document !== "undefined" && createPortal(
+        <div className="challenge-outcome-overlay">
+          <div className="challenge-outcome-modal" role="dialog" aria-modal="true" aria-labelledby="challenge-complete-title">
+            <span className="history-detail-kicker">Battle record</span>
+            <h2 id="challenge-complete-title">Challenge complete?</h2>
+            <input
+              className="challenge-outcome-name-input"
+              type="text"
+              value={challengerName}
+              onChange={(event) => setChallengerName(event.target.value)}
+              placeholder="Enter challenger name"
+            />
+            <p>{challengerName.trim() || "Name the challenger before choosing an outcome."}</p>
+            <div className="challenge-outcome-modal-buttons">
+              <button
+                className="challenge-outcome-btn challenge-success-btn"
+                onClick={handleSuccessfulChallenge}
+                disabled={!challengerName.trim()}
+              >
+                &#10003; Success
+              </button>
+              <button
+                className="challenge-outcome-btn challenge-failure-btn"
+                onClick={handleFailedChallenge}
+                disabled={!challengerName.trim()}
+              >
+                &#10005; Failed
+              </button>
+            </div>
           </div>
         </div>,
         document.body
@@ -714,6 +844,9 @@ export default function Home() {
         <BossResultCard
           boss={selectedBoss}
           onClose={() => setShowBossResult(false)}
+          challengerName={challengerName}
+          onChallengerNameChange={setChallengerName}
+          challengeDateTime={challengeDateTime}
         />
       )}
     </main>
