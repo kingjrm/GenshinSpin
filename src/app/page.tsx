@@ -56,7 +56,6 @@ export default function Home() {
   const [challengeDateTime, setChallengeDateTime] = useState("");
   const [isChallengeTimerComplete, setIsChallengeTimerComplete] = useState(false);
   const [challengeElapsedMilliseconds, setChallengeElapsedMilliseconds] = useState(0);
-  const [showChallengerEditor, setShowChallengerEditor] = useState(false);
 
   // Optional boss rules
   const [bossTimeLimit, setBossTimeLimit] = useState<number | null>(null);
@@ -240,7 +239,6 @@ export default function Home() {
     setShowBossBattleOverlay(false);
     setIsChallengeTimerComplete(false);
     setChallengerName("");
-    setShowChallengerEditor(false);
   }, [challengeDateTime, challengeElapsedMilliseconds, challengerName, isChallengeTimerComplete, selectedBoss, teamCharacters]);
 
   const handleFailedChallenge = useCallback(() => {
@@ -260,7 +258,6 @@ export default function Home() {
     setShowBossBattleOverlay(false);
     setIsChallengeTimerComplete(false);
     setChallengerName("");
-    setShowChallengerEditor(false);
   }, [challengeDateTime, challengeElapsedMilliseconds, challengerName, isChallengeTimerComplete, selectedBoss, teamCharacters]);
 
   // Global reset wheel
@@ -281,7 +278,6 @@ export default function Home() {
     setChallengeDateTime("");
     setIsChallengeTimerComplete(false);
     setChallengeElapsedMilliseconds(0);
-    setShowChallengerEditor(false);
     setBossTimeLimit(null);
     setWeaponReq("any");
   }, [handleResetFilters]);
@@ -527,7 +523,7 @@ export default function Home() {
               </div>
             )}
 
-            <SpinHistory history={history} bossBattles={bossBattles} onClearHistory={handleClearHistory} />
+            <SpinHistory bossBattles={bossBattles} onClearHistory={() => setBossBattles([])} />
           </aside>
         </div>
 
@@ -602,7 +598,6 @@ export default function Home() {
                     setChallengeDateTime(getLocalDateTimeValue());
                     setIsChallengeTimerComplete(false);
                     setChallengeElapsedMilliseconds(0);
-                    setShowChallengerEditor(false);
                     setShowBossResult(true);
                   }}
                   isSpinning={isBossSpinning}
@@ -738,26 +733,6 @@ export default function Home() {
                   {/* BOSS */}
                   <div className="matchup-boss-card glass-panel-inner">
                     <h3 className="matchup-card-title">BOSS</h3>
-                    <div className={`boss-challenger-editor${showChallengerEditor ? " open" : ""}`}>
-                      <button
-                        className="boss-challenger-toggle"
-                        onClick={() => setShowChallengerEditor((open) => !open)}
-                        type="button"
-                      >
-                        &#9998; Name
-                      </button>
-                      <div className="boss-challenger-inline">
-                        <label htmlFor="battle-challenger-name">Challenger</label>
-                        <input
-                          id="battle-challenger-name"
-                          type="text"
-                          value={challengerName}
-                          onChange={(event) => setChallengerName(event.target.value)}
-                          placeholder="Enter name"
-                        />
-                        <span>{challengeDateTime ? new Date(challengeDateTime).toLocaleString() : "--"}</span>
-                      </div>
-                    </div>
                     <div className="matchup-boss-content">
                       <CharacterImage
                         name={selectedBoss.name}
@@ -807,14 +782,14 @@ export default function Home() {
               onChange={(event) => setChallengerName(event.target.value)}
               placeholder="Enter challenger name"
             />
-            <p>{challengerName.trim() || "Name the challenger before choosing an outcome."}</p>
+            <p>Name the challenger before choosing an outcome.</p>
             <div className="challenge-outcome-modal-buttons">
               <button
                 className="challenge-outcome-btn challenge-success-btn"
                 onClick={handleSuccessfulChallenge}
                 disabled={!challengerName.trim()}
               >
-                &#10003; Success
+                Success
               </button>
               <button
                 className="challenge-outcome-btn challenge-failure-btn"
@@ -844,9 +819,6 @@ export default function Home() {
         <BossResultCard
           boss={selectedBoss}
           onClose={() => setShowBossResult(false)}
-          challengerName={challengerName}
-          onChallengerNameChange={setChallengerName}
-          challengeDateTime={challengeDateTime}
         />
       )}
     </main>

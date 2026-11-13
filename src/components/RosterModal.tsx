@@ -141,7 +141,7 @@ export default function RosterModal({
               onClick={() => onSelectVisible(filtered.map(c => c.name))}
               className="rm-action-btn rm-btn-gold"
             >
-              ✓ Select All ({filtered.length})
+              Select All ({filtered.length})
             </button>
             <button
               onClick={() => onDeselectVisible(filtered.map(c => c.name))}
@@ -195,7 +195,7 @@ export default function RosterModal({
                     {!isActive && <div className="rm-card-off-overlay" />}
                     {/* Status badge */}
                     <span className={`rm-card-status ${isActive ? "rm-status-on" : "rm-status-off"}`}>
-                      {isActive ? "✓" : "✕"}
+                      {isActive ? "ON" : "OFF"}
                     </span>
                   </div>
 
