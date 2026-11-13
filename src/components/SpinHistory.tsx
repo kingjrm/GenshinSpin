@@ -28,6 +28,7 @@ export default function SpinHistory({ bossBattles = [], onClearHistory, onRetryB
   const [outcomeFilter, setOutcomeFilter] = React.useState<"all" | "won" | "lost">("all");
   const [regionFilter, setRegionFilter] = React.useState("all");
   const [challengerFilter, setChallengerFilter] = React.useState("all");
+  const [sortBy, setSortBy] = React.useState<"newest" | "oldest" | "fastest" | "slowest">("newest");
 
   const regions = Array.from(new Set(bossBattles.map((battle) => battle.boss.region))).sort();
   const challengers = Array.from(new Set(bossBattles.map((battle) => battle.challengerName))).sort();
@@ -40,6 +41,12 @@ export default function SpinHistory({ bossBattles = [], onClearHistory, onRetryB
     const matchesRegion = regionFilter === "all" || battle.boss.region === regionFilter;
     const matchesChallenger = challengerFilter === "all" || battle.challengerName === challengerFilter;
     return matchesSearch && matchesOutcome && matchesRegion && matchesChallenger;
+  }).sort((a, b) => {
+    if (sortBy === "fastest") return a.elapsedMilliseconds - b.elapsedMilliseconds;
+    if (sortBy === "slowest") return b.elapsedMilliseconds - a.elapsedMilliseconds;
+    const aDate = new Date(a.dateTime).getTime();
+    const bDate = new Date(b.dateTime).getTime();
+    return sortBy === "oldest" ? aDate - bDate : bDate - aDate;
   });
 
   return (
@@ -202,6 +209,12 @@ export default function SpinHistory({ bossBattles = [], onClearHistory, onRetryB
               <select value={challengerFilter} onChange={(event) => setChallengerFilter(event.target.value)}>
                 <option value="all">All challengers</option>
                 {challengers.map((challenger) => <option key={challenger} value={challenger}>{challenger}</option>)}
+              </select>
+              <select value={sortBy} onChange={(event) => setSortBy(event.target.value as "newest" | "oldest" | "fastest" | "slowest")}>
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="fastest">Fastest clear time</option>
+                <option value="slowest">Slowest clear time</option>
               </select>
             </div>
             <div className="history-expanded-list">

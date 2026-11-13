@@ -989,7 +989,7 @@ input:checked + .slider:before {
 
 .history-filters {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) repeat(3, minmax(145px, 170px));
+  grid-template-columns: minmax(220px, 1fr) repeat(4, minmax(140px, 170px));
   gap: 10px;
   margin-bottom: 16px;
 }
