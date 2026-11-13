@@ -56,6 +56,7 @@ export default function Home() {
   const [challengeDateTime, setChallengeDateTime] = useState("");
   const [isChallengeTimerComplete, setIsChallengeTimerComplete] = useState(false);
   const [challengeElapsedMilliseconds, setChallengeElapsedMilliseconds] = useState(0);
+  const [isRetryingBattle, setIsRetryingBattle] = useState(false);
 
   // Optional boss rules
   const [bossTimeLimit, setBossTimeLimit] = useState<number | null>(null);
@@ -239,6 +240,7 @@ export default function Home() {
     setShowBossBattleOverlay(false);
     setIsChallengeTimerComplete(false);
     setChallengerName("");
+    setIsRetryingBattle(false);
   }, [challengeDateTime, challengeElapsedMilliseconds, challengerName, isChallengeTimerComplete, selectedBoss, teamCharacters]);
 
   const handleFailedChallenge = useCallback(() => {
@@ -258,6 +260,7 @@ export default function Home() {
     setShowBossBattleOverlay(false);
     setIsChallengeTimerComplete(false);
     setChallengerName("");
+    setIsRetryingBattle(false);
   }, [challengeDateTime, challengeElapsedMilliseconds, challengerName, isChallengeTimerComplete, selectedBoss, teamCharacters]);
 
   // Global reset wheel
@@ -280,7 +283,26 @@ export default function Home() {
     setChallengeElapsedMilliseconds(0);
     setBossTimeLimit(null);
     setWeaponReq("any");
+    setIsRetryingBattle(false);
   }, [handleResetFilters]);
+
+  const handleRetryBattle = useCallback((battle: BossBattleRecord) => {
+    const retryTeamSize = Math.min(4, Math.max(1, battle.team.length)) as 1 | 2 | 3 | 4;
+    const retryBossType = battle.boss.category === "World Boss"
+      ? "world"
+      : battle.boss.category === "Weekly Boss" ? "weekly" : "local";
+    setTeamSize(retryTeamSize);
+    setTeam(battle.team);
+    setBossType(retryBossType);
+    setSelectedBoss(battle.boss);
+    setShowBossResult(false);
+    setChallengerName("");
+    setChallengeDateTime(getLocalDateTimeValue());
+    setIsChallengeTimerComplete(false);
+    setChallengeElapsedMilliseconds(0);
+    setIsRetryingBattle(true);
+    setShowBossBattleOverlay(true);
+  }, []);
 
   const handleSpinAgainBoss = useCallback(() => {
     setSelectedBoss(null);
@@ -523,7 +545,11 @@ export default function Home() {
               </div>
             )}
 
-            <SpinHistory bossBattles={bossBattles} onClearHistory={() => setBossBattles([])} />
+            <SpinHistory
+              bossBattles={bossBattles}
+              onClearHistory={() => setBossBattles([])}
+              onRetryBattle={handleRetryBattle}
+            />
           </aside>
         </div>
 
@@ -754,9 +780,11 @@ export default function Home() {
 
                 <div className="matchup-actions">
                   <div className="matchup-action-buttons">
-                    <button onClick={handleSpinAgainBoss} className="boss-action-btn spin-again-btn">
-                      SPIN AGAIN
-                    </button>
+                    {!isRetryingBattle && (
+                      <button onClick={handleSpinAgainBoss} className="boss-action-btn spin-again-btn">
+                        SPIN AGAIN
+                      </button>
+                    )}
                     <button onClick={handleResetWheel} className="boss-action-btn new-team-btn">
                       NEW TEAM
                     </button>

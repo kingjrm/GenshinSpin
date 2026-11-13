@@ -18,16 +18,19 @@ export interface BossBattleRecord {
 interface SpinHistoryProps {
   bossBattles?: BossBattleRecord[];
   onClearHistory: () => void;
+  onRetryBattle: (battle: BossBattleRecord) => void;
 }
 
-export default function SpinHistory({ bossBattles = [], onClearHistory }: SpinHistoryProps) {
+export default function SpinHistory({ bossBattles = [], onClearHistory, onRetryBattle }: SpinHistoryProps) {
   const [selectedBattle, setSelectedBattle] = React.useState<BossBattleRecord | null>(null);
   const [showExpanded, setShowExpanded] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const [outcomeFilter, setOutcomeFilter] = React.useState<"all" | "won" | "lost">("all");
   const [regionFilter, setRegionFilter] = React.useState("all");
+  const [challengerFilter, setChallengerFilter] = React.useState("all");
 
   const regions = Array.from(new Set(bossBattles.map((battle) => battle.boss.region))).sort();
+  const challengers = Array.from(new Set(bossBattles.map((battle) => battle.challengerName))).sort();
   const filteredBattles = bossBattles.filter((battle) => {
     const query = search.trim().toLowerCase();
     const matchesSearch = !query
@@ -35,7 +38,8 @@ export default function SpinHistory({ bossBattles = [], onClearHistory }: SpinHi
       || battle.challengerName.toLowerCase().includes(query);
     const matchesOutcome = outcomeFilter === "all" || battle.outcome === outcomeFilter;
     const matchesRegion = regionFilter === "all" || battle.boss.region === regionFilter;
-    return matchesSearch && matchesOutcome && matchesRegion;
+    const matchesChallenger = challengerFilter === "all" || battle.challengerName === challengerFilter;
+    return matchesSearch && matchesOutcome && matchesRegion && matchesChallenger;
   });
 
   return (
@@ -148,6 +152,17 @@ export default function SpinHistory({ bossBattles = [], onClearHistory }: SpinHi
                 ))}
               </div>
             </div>
+            <button
+              className="history-retry-btn"
+              onClick={() => {
+                onRetryBattle(selectedBattle);
+                setSelectedBattle(null);
+                setShowExpanded(false);
+              }}
+              type="button"
+            >
+              Retry This Challenge
+            </button>
           </div>
         </div>
       )}
@@ -183,6 +198,10 @@ export default function SpinHistory({ bossBattles = [], onClearHistory }: SpinHi
               <select value={regionFilter} onChange={(event) => setRegionFilter(event.target.value)}>
                 <option value="all">All regions</option>
                 {regions.map((region) => <option key={region} value={region}>{region}</option>)}
+              </select>
+              <select value={challengerFilter} onChange={(event) => setChallengerFilter(event.target.value)}>
+                <option value="all">All challengers</option>
+                {challengers.map((challenger) => <option key={challenger} value={challenger}>{challenger}</option>)}
               </select>
             </div>
             <div className="history-expanded-list">
