@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { charactersData, Character } from "@/data/characters";
-import { worldBosses, weeklyBosses, localLegends, bossesData, Boss, getBossImageUrl, getRegionElement } from "@/data/bosses";
+import { worldBosses, weeklyBosses, localLegends, underwaterBosses, nightsoulTotems, bossesData, Boss, getBossImageUrl, getRegionElement } from "@/data/bosses";
 import Wheel from "@/components/Wheel";
 import BossWheel from "@/components/BossWheel";
 import FilterPanel, { FilterState } from "@/components/FilterPanel";
@@ -18,6 +18,8 @@ import BossTimer from "@/components/BossTimer";
 import "./page.css";
 import "./mobile.css";
 
+type BossType = "world" | "weekly" | "local" | "underwater" | "nightsoul" | "all";
+
 const getLocalDateTimeValue = () => {
   const now = new Date();
   const offset = now.getTimezoneOffset() * 60000;
@@ -30,6 +32,7 @@ export default function Home() {
   const [selectedNames, setSelectedNames] = useState<Set<string>>(
     () => new Set(charactersData.map((c) => c.name))
   );
+  const [disabledNames, setDisabledNames] = useState<Set<string>>(() => new Set());
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<FilterState>({
     rarity: "all",
@@ -47,7 +50,8 @@ export default function Home() {
   const [isSpinning, setIsSpinning] = useState(false);
 
   // Boss state variables
-  const [bossType, setBossType] = useState<"world" | "weekly" | "local" | "all" | null>(null);
+  const [bossTypes, setBossTypes] = useState<BossType[]>([]);
+  const [isBossPoolConfirmed, setIsBossPoolConfirmed] = useState(false);
   const [selectedBoss, setSelectedBoss] = useState<Boss | null>(null);
   const [isBossSpinning, setIsBossSpinning] = useState(false);
   const [showBossResult, setShowBossResult] = useState(false);
@@ -65,12 +69,18 @@ export default function Home() {
   const [customTimeSec, setCustomTimeSec] = useState<string>("");
 
   const activeBosses = useMemo(() => {
-    if (bossType === "world") return worldBosses;
-    if (bossType === "weekly") return weeklyBosses;
-    if (bossType === "local") return localLegends;
-    if (bossType === "all") return bossesData;
-    return [];
-  }, [bossType]);
+    if (bossTypes.includes("all")) return bossesData;
+    const pools = new Map<BossType, Boss[]>([
+      ["world", worldBosses],
+      ["weekly", weeklyBosses],
+      ["local", localLegends],
+      ["underwater", underwaterBosses],
+      ["nightsoul", nightsoulTotems],
+    ]);
+    const uniqueBosses = new Map<string, Boss>();
+    bossTypes.forEach((type) => pools.get(type)?.forEach((boss) => uniqueBosses.set(boss.name, boss)));
+    return Array.from(uniqueBosses.values());
+  }, [bossTypes]);
 
   const teamCharacters = useMemo(() => {
     return team.slice(0, teamSize);
@@ -87,9 +97,15 @@ export default function Home() {
   // Trigger boss battle overlay once team is full
   React.useEffect(() => {
     if (team.length > 0 && team.length === teamSize) {
+      if (!isRetryingBattle) {
+        setSelectedBoss(null);
+        setShowBossResult(false);
+        setBossTypes([]);
+        setIsBossPoolConfirmed(false);
+      }
       setShowBossBattleOverlay(true);
     }
-  }, [team.length, teamSize]);
+  }, [isRetryingBattle, team.length, teamSize]);
 
   // Auto-pick rules whenever a boss is selected
   React.useEffect(() => {
@@ -145,16 +161,23 @@ export default function Home() {
   // Toggles character status in pool
   const handleToggleCharacter = useCallback((name: string) => {
     if (isSpinning) return;
+    const isSelected = selectedNames.has(name);
     setSelectedNames((prev) => {
       const next = new Set(prev);
-      if (next.has(name)) {
+      if (isSelected) {
         next.delete(name);
       } else {
         next.add(name);
       }
       return next;
     });
-  }, [isSpinning]);
+    setDisabledNames((prev) => {
+      const next = new Set(prev);
+      if (isSelected) next.add(name);
+      else next.delete(name);
+      return next;
+    });
+  }, [isSpinning, selectedNames]);
 
   // Select all filtered characters
   const handleSelectAll = useCallback(() => {
@@ -162,6 +185,11 @@ export default function Home() {
     setSelectedNames((prev) => {
       const next = new Set(prev);
       filteredCharacters.forEach((c) => next.add(c.name));
+      return next;
+    });
+    setDisabledNames((prev) => {
+      const next = new Set(prev);
+      filteredCharacters.forEach((c) => next.delete(c.name));
       return next;
     });
   }, [isSpinning, filteredCharacters]);
@@ -174,12 +202,18 @@ export default function Home() {
       filteredCharacters.forEach((c) => next.delete(c.name));
       return next;
     });
+    setDisabledNames((prev) => {
+      const next = new Set(prev);
+      filteredCharacters.forEach((c) => next.add(c.name));
+      return next;
+    });
   }, [isSpinning, filteredCharacters]);
 
   // Reset the pool to default checked state (all 118 checked)
   const handleResetPool = useCallback(() => {
     if (isSpinning) return;
     setSelectedNames(new Set(charactersData.map((c) => c.name)));
+    setDisabledNames(new Set());
   }, [isSpinning]);
 
   // Reset all filters to default
@@ -200,6 +234,12 @@ export default function Home() {
       next.delete(name);
       return next;
     });
+    setDisabledNames((prev) => new Set(prev).add(name));
+  }, []);
+
+  const handleRemoveFromTeam = useCallback((name: string) => {
+    setTeam((prev) => prev.filter((character) => character.name !== name));
+    setDisabledNames((prev) => new Set(prev).add(name));
   }, []);
 
   // Spin complete handler — NOTE: never call setState inside another setState's updater
@@ -234,7 +274,8 @@ export default function Home() {
       elapsedMilliseconds: challengeElapsedMilliseconds,
     }, ...prev]);
     setTeam([]);
-    setBossType(null);
+    setBossTypes([]);
+    setIsBossPoolConfirmed(false);
     setSelectedBoss(null);
     setShowBossResult(false);
     setShowBossBattleOverlay(false);
@@ -254,7 +295,8 @@ export default function Home() {
       elapsedMilliseconds: challengeElapsedMilliseconds,
     }, ...prev]);
     setTeam([]);
-    setBossType(null);
+    setBossTypes([]);
+    setIsBossPoolConfirmed(false);
     setSelectedBoss(null);
     setShowBossResult(false);
     setShowBossBattleOverlay(false);
@@ -265,14 +307,15 @@ export default function Home() {
 
   // Global reset wheel
   const handleResetWheel = useCallback(() => {
-    setSelectedNames(new Set(charactersData.map((c) => c.name)));
+    setSelectedNames(new Set(charactersData.filter((character) => disabledNames.has(character.name) === false).map((character) => character.name)));
     handleResetFilters();
     setResult(null);
     setRemoveAfterSpin(true);
     setTeam([]);
     setShowRosterModal(false);
     // Reset boss states
-    setBossType(null);
+    setBossTypes([]);
+    setIsBossPoolConfirmed(false);
     setSelectedBoss(null);
     setIsBossSpinning(false);
     setShowBossResult(false);
@@ -284,16 +327,19 @@ export default function Home() {
     setBossTimeLimit(null);
     setWeaponReq("any");
     setIsRetryingBattle(false);
-  }, [handleResetFilters]);
+  }, [disabledNames, handleResetFilters]);
 
   const handleRetryBattle = useCallback((battle: BossBattleRecord) => {
     const retryTeamSize = Math.min(4, Math.max(1, battle.team.length)) as 1 | 2 | 3 | 4;
     const retryBossType = battle.boss.category === "World Boss"
       ? "world"
-      : battle.boss.category === "Weekly Boss" ? "weekly" : "local";
+      : battle.boss.category === "Weekly Boss" ? "weekly"
+        : battle.boss.category === "Underwater" ? "underwater"
+          : battle.boss.category === "Nightsoul Totem" ? "nightsoul" : "local";
     setTeamSize(retryTeamSize);
     setTeam(battle.team);
-    setBossType(retryBossType);
+    setBossTypes([retryBossType]);
+    setIsBossPoolConfirmed(true);
     setSelectedBoss(battle.boss);
     setShowBossResult(false);
     setChallengerName("");
@@ -307,6 +353,37 @@ export default function Home() {
   const handleSpinAgainBoss = useCallback(() => {
     setSelectedBoss(null);
     setShowBossResult(false);
+    setIsRetryingBattle(false);
+  }, []);
+
+  const handleSelectVisible = useCallback((names: string[]) => {
+    if (isSpinning) return;
+    setSelectedNames((prev) => new Set([...prev, ...names]));
+    setDisabledNames((prev) => {
+      const next = new Set(prev);
+      names.forEach((name) => next.delete(name));
+      return next;
+    });
+  }, [isSpinning]);
+
+  const handleDeselectVisible = useCallback((names: string[]) => {
+    if (isSpinning) return;
+    setSelectedNames((prev) => {
+      const next = new Set(prev);
+      names.forEach((name) => next.delete(name));
+      return next;
+    });
+    setDisabledNames((prev) => new Set([...prev, ...names]));
+  }, [isSpinning]);
+
+  const toggleBossType = useCallback((type: BossType) => {
+    setBossTypes((prev) => {
+      if (type === "all") return prev.includes("all") ? [] : ["all"];
+      const withoutAll = prev.filter((selectedType) => selectedType !== "all");
+      return withoutAll.includes(type)
+        ? withoutAll.filter((selectedType) => selectedType !== type)
+        : [...withoutAll, type];
+    });
   }, []);
 
   const allCharactersSelectedGone = selectedNames.size === 0;
@@ -428,7 +505,7 @@ export default function Home() {
                         {([1, 2, 3, 4] as const).map((n) => (
                           <button
                             key={n}
-                            onClick={() => { setTeamSize(n); setTeam([]); setBossType(null); setSelectedBoss(null); setShowBossBattleOverlay(false); }}
+                            onClick={() => { setTeamSize(n); setTeam([]); setBossTypes([]); setIsBossPoolConfirmed(false); setSelectedBoss(null); setShowBossBattleOverlay(false); }}
                             className={`team-size-btn ${teamSize === n ? "active" : ""}`}
                             disabled={isSpinning}
                           >
@@ -528,9 +605,7 @@ export default function Home() {
                         <button
                           className="team-remove-btn"
                           title={`Remove ${char.name} from team`}
-                          onClick={() => {
-                            setTeam((prev) => prev.filter((_, i) => i !== idx));
-                          }}
+                          onClick={() => handleRemoveFromTeam(char.name)}
                         >
                           ✕
                         </button>
@@ -557,8 +632,8 @@ export default function Home() {
         <RosterModal
           selectedNames={selectedNames}
           onToggleCharacter={handleToggleCharacter}
-          onSelectVisible={(names) => { if (!isSpinning) setSelectedNames((prev) => { const n = new Set(prev); names.forEach(name => n.add(name)); return n; }); }}
-          onDeselectVisible={(names) => { if (!isSpinning) setSelectedNames((prev) => { const n = new Set(prev); names.forEach(name => n.delete(name)); return n; }); }}
+          onSelectVisible={handleSelectVisible}
+          onDeselectVisible={handleDeselectVisible}
           onResetPool={handleResetPool}
           onClose={() => setShowRosterModal(false)}
         />
@@ -584,31 +659,44 @@ export default function Home() {
               <div className="boss-divider" />
             </div>
 
-            {bossType === null ? (
+            {!isBossPoolConfirmed ? (
               <div className="boss-setup">
-                <p className="boss-section-desc">Choose Boss Type</p>
+                <p className="boss-section-desc">Choose one or more boss types</p>
                 <div className="boss-type-buttons">
-                  <button onClick={() => setBossType("world")} className="boss-type-btn">
+                  <button onClick={() => toggleBossType("world")} className={`boss-type-btn ${bossTypes.includes("world") ? "active" : ""}`}>
                     World Boss
                   </button>
-                  <button onClick={() => setBossType("weekly")} className="boss-type-btn">
+                  <button onClick={() => toggleBossType("weekly")} className={`boss-type-btn ${bossTypes.includes("weekly") ? "active" : ""}`}>
                     Weekly Boss
                   </button>
-                  <button onClick={() => setBossType("local")} className="boss-type-btn">
+                  <button onClick={() => toggleBossType("local")} className={`boss-type-btn ${bossTypes.includes("local") ? "active" : ""}`}>
                     Local Legends
                   </button>
-                  <button onClick={() => setBossType("all")} className="boss-type-btn">
+                  <button onClick={() => toggleBossType("underwater")} className={`boss-type-btn ${bossTypes.includes("underwater") ? "active" : ""}`}>
+                    Underwater
+                  </button>
+                  <button onClick={() => toggleBossType("nightsoul")} className={`boss-type-btn ${bossTypes.includes("nightsoul") ? "active" : ""}`}>
+                    Nightsoul Totems
+                  </button>
+                  <button onClick={() => toggleBossType("all")} className={`boss-type-btn ${bossTypes.includes("all") ? "active" : ""}`}>
                     All
                   </button>
                 </div>
+                <button
+                  className="boss-type-confirm-btn"
+                  disabled={bossTypes.length === 0}
+                  onClick={() => setIsBossPoolConfirmed(true)}
+                >
+                  Confirm Selection
+                </button>
               </div>
             ) : selectedBoss === null ? (
               <div className="boss-wheel-container">
                 <div className="boss-pool-info-bar">
                   <span className="boss-pool-label">
-                    Active Pool: {bossType === "world" ? "World Bosses" : bossType === "weekly" ? "Weekly Bosses" : bossType === "local" ? "Local Legends" : "All Bosses/Legends"} ({activeBosses.length})
+                    Active Pool: {bossTypes.includes("all") ? "All Bosses/Legends" : bossTypes.map((type) => type === "world" ? "World Bosses" : type === "weekly" ? "Weekly Bosses" : type === "local" ? "Local Legends" : type === "underwater" ? "Underwater" : "Nightsoul Totems").join(" + ")} ({activeBosses.length})
                   </span>
-                  <button onClick={() => setBossType(null)} className="boss-change-pool-btn">
+                  <button onClick={() => { setBossTypes([]); setIsBossPoolConfirmed(false); }} className="boss-change-pool-btn">
                     Change Pool
                   </button>
                 </div>
@@ -724,7 +812,7 @@ export default function Home() {
                   <div className="matchup-team-card glass-panel-inner">
                     <h3 className="matchup-card-title">YOUR TEAM</h3>
                     <div className="matchup-team-portraits">
-                      {teamCharacters.map((char, idx) => (
+                      {teamCharacters.map((char) => (
                         <div key={char.name} className="matchup-portrait-item">
                           <div className="relative">
                             <CharacterImage
@@ -737,7 +825,7 @@ export default function Home() {
                             <button
                               className="team-remove-btn"
                               title={`Remove ${char.name}`}
-                              onClick={() => setTeam((prev) => prev.filter((_, i) => i !== idx))}
+                              onClick={() => handleRemoveFromTeam(char.name)}
                             >
                               &#10005;
                             </button>
@@ -777,11 +865,9 @@ export default function Home() {
 
                 <div className="matchup-actions">
                   <div className="matchup-action-buttons">
-                    {!isRetryingBattle && (
-                      <button onClick={handleSpinAgainBoss} className="boss-action-btn spin-again-btn">
-                        SPIN AGAIN
-                      </button>
-                    )}
+                    <button onClick={handleSpinAgainBoss} className="boss-action-btn spin-again-btn">
+                      SPIN AGAIN
+                    </button>
                     <button onClick={handleResetWheel} className="boss-action-btn new-team-btn">
                       NEW TEAM
                     </button>

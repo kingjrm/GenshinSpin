@@ -17,6 +17,7 @@ export default function BossTimer({ seconds, onExpire, onStop, onReset, onComple
   const [running, setRunning] = useState(false);
   const [expired, setExpired] = useState(false);
   const [stopped, setStopped] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   const animationFrameRef = useRef<number | null>(null);
   const lastTickRef = useRef<number | null>(null);
@@ -61,6 +62,26 @@ export default function BossTimer({ seconds, onExpire, onStop, onReset, onComple
     };
   }, [running, totalMilliseconds]);
 
+  useEffect(() => {
+    if (countdown === null) return;
+
+    const countdownTimer = window.setTimeout(() => {
+      if (countdown === 1) {
+        setCountdown(null);
+        setRunning(true);
+      } else {
+        setCountdown(countdown - 1);
+      }
+    }, 1000);
+
+    return () => window.clearTimeout(countdownTimer);
+  }, [countdown]);
+
+  const handleStart = () => {
+    if (running || countdown !== null || expired || stopped) return;
+    setCountdown(3);
+  };
+
   const handleReset = useCallback(() => {
     if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
     remainingRef.current = totalMilliseconds;
@@ -68,6 +89,7 @@ export default function BossTimer({ seconds, onExpire, onStop, onReset, onComple
     setRunning(false);
     setExpired(false);
     setStopped(false);
+    setCountdown(null);
     lastTickRef.current = null;
     onResetRef.current?.();
   }, [totalMilliseconds]);
@@ -92,7 +114,9 @@ export default function BossTimer({ seconds, onExpire, onStop, onReset, onComple
   return (
     <div className={`boss-timer ${expired ? "expired" : ""}`}>
       <div className="boss-timer-display" style={{ color: expired ? "#ff4444" : color }}>
-        {expired ? "TIME'S UP!" : <>{mm}:{ss}<span className="boss-timer-ms">.{ms}</span></>}
+        {countdown !== null
+          ? countdown
+          : expired ? "TIME'S UP!" : <>{mm}:{ss}<span className="boss-timer-ms">.{ms}</span></>}
       </div>
       <div className="boss-timer-bar-track">
         <div
@@ -105,7 +129,7 @@ export default function BossTimer({ seconds, onExpire, onStop, onReset, onComple
       </div>
       <div className="boss-timer-actions">
         {!running && !expired && !stopped && (
-          <button className="boss-timer-btn start" onClick={() => setRunning(true)}>
+          <button className="boss-timer-btn start" onClick={handleStart}>
             &#9654; Start
           </button>
         )}

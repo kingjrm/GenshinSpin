@@ -1,6 +1,6 @@
 export interface Boss {
   name: string;
-  category: "World Boss" | "Weekly Boss" | "Local Legend";
+  category: "World Boss" | "Weekly Boss" | "Local Legend" | "Underwater" | "Nightsoul Totem";
   region: "Mondstadt" | "Liyue" | "Inazuma" | "Sumeru" | "Fontaine" | "Natlan" | "Snezhnaya" | "Nod-Krai" | "None";
   apiId?: string;
   wikiFilename?: string;
@@ -84,37 +84,19 @@ export const localLegends: Boss[] = [
   { name: "Homesick Lone Wolf", category: "Local Legend", region: "Nod-Krai" },
   { name: "Mushteshir", category: "Local Legend", region: "Nod-Krai" },
   { name: "Prism Slime", category: "Local Legend", region: "Nod-Krai" },
-  { name: "Atlatl's Blessing", category: "Local Legend", region: "Natlan" },
   { name: "Balachko", category: "Local Legend", region: "Natlan" },
   { name: "Bronzelock", category: "Local Legend", region: "Natlan" },
-  { name: "Chimalli's Shade", category: "Local Legend", region: "Natlan" },
-  { name: "Cihuacoatl of Chimeric Bone", category: "Local Legend", region: "Natlan" },
   { name: "Cocijo", category: "Local Legend", region: "Natlan" },
-  { name: "He Never Dies", category: "Local Legend", region: "Natlan" },
-  { name: "Ichcahuipilli's Aegis", category: "Local Legend", region: "Natlan" },
-  { name: "Ironbeard", category: "Local Legend", region: "Natlan" },
   { name: "Polychrome Tri-Stars", category: "Local Legend", region: "Natlan" },
-  { name: "Potapo's Solidarity", category: "Local Legend", region: "Natlan" },
   { name: "Rilai", category: "Local Legend", region: "Natlan" },
   { name: "Sappho Amidst The Waves", category: "Local Legend", region: "Natlan" },
-  { name: "Spirit of the Fallen Dawnstar", category: "Local Legend", region: "Natlan" },
-  { name: "Tlatzacuilotl", category: "Local Legend", region: "Natlan" },
-  { name: "Tupayo's Aid", category: "Local Legend", region: "Natlan" },
-  { name: "Tupu's Lushness", category: "Local Legend", region: "Natlan" },
-  { name: "Reji", category: "Local Legend", region: "Natlan" },
   { name: "Ironclaw and Battlegoat", category: "Local Legend", region: "Natlan" },
   { name: "The Peak", category: "Local Legend", region: "Natlan" },
   { name: "Infinitesimal", category: "Local Legend", region: "Natlan" },
   { name: "The Last Survivor of Tenochtzitoc", category: "Local Legend", region: "Natlan" },
-  { name: "Iron Viscount", category: "Local Legend", region: "Fontaine" },
   { name: "Vivianne of the Lake", category: "Local Legend", region: "Fontaine" },
   { name: "Ninianne of the Lake", category: "Local Legend", region: "Fontaine" },
-  { name: "Dobharcu, Lord of the Hidden", category: "Local Legend", region: "Fontaine" },
-  { name: "Swords of the Gorge", category: "Local Legend", region: "Fontaine" },
-  { name: "Ocean Circuit Judge", category: "Local Legend", region: "Fontaine" },
-  { name: "Fading Veteran", category: "Local Legend", region: "Fontaine" },
   { name: "Yseut", category: "Local Legend", region: "Fontaine" },
-  { name: "Luachra, the Brilliant", category: "Local Legend", region: "Fontaine" },
   { name: "Automated Supercomputing Field Generator", category: "Local Legend", region: "Fontaine" },
   { name: "Liam", category: "Local Legend", region: "Fontaine" },
   { name: "Rocky Avildsen", category: "Local Legend", region: "Fontaine" },
@@ -130,7 +112,34 @@ export const localLegends: Boss[] = [
   { name: "Rowdy Beast Host", category: "Local Legend", region: "Snezhnaya" }
 ];
 
-export const bossesData: Boss[] = [...worldBosses, ...weeklyBosses, ...localLegends];
+export const underwaterBosses: Boss[] = [
+  { name: "Iron Viscount", category: "Underwater", region: "Fontaine" },
+  { name: "Dobharcu, Lord of the Hidden", category: "Underwater", region: "Fontaine" },
+  { name: "Swords of the Gorge", category: "Underwater", region: "Fontaine" },
+  { name: "Fairy Knight Twins", category: "Underwater", region: "Fontaine" },
+  { name: "Ocean Circuit Judge", category: "Underwater", region: "Fontaine" },
+  { name: "Fading Veteran", category: "Underwater", region: "Fontaine" },
+  { name: "Luachra the Brilliant", category: "Underwater", region: "Fontaine" },
+  { name: "Mageblade Corrouge", category: "Underwater", region: "Fontaine" },
+  { name: "Chassanion", category: "Underwater", region: "Fontaine" },
+];
+
+export const nightsoulTotems: Boss[] = [
+  { name: "He Never Dies", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Ichcahuipilli's Aegis", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Atlatl's Blessing", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Cihuacoatl of Chimeric Bone", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Tlatzacuilotl", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Chimalli's Shade", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Ironbeard", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Potapo's Solidarity", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Tupayo's Aid", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Spirit of the Fallen Dawnstar", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Reji", category: "Nightsoul Totem", region: "Natlan" },
+  { name: "Tupu's Lushness", category: "Nightsoul Totem", region: "Natlan" },
+];
+
+export const bossesData: Boss[] = [...worldBosses, ...weeklyBosses, ...localLegends, ...underwaterBosses, ...nightsoulTotems];
 
 export function getBossImageUrl(boss: Boss, _type: "icon" | "portrait" = "icon"): string {
   // Use our server-side proxy which resolves Fandom URLs and bypasses hotlink protection

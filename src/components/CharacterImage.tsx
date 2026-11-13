@@ -118,7 +118,6 @@ export default function CharacterImage({
           }
         }}
         loading="lazy"
-        crossOrigin="anonymous"
       />
     </div>
   );

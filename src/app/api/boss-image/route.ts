@@ -57,7 +57,7 @@ async function fetchImage(imageUrl: string): Promise<Response | null> {
       },
       signal: AbortSignal.timeout(8000),
     });
-    if (!res.ok) return null;
+    if (!res.ok || !res.headers.get("content-type")?.startsWith("image/")) return null;
     return res;
   } catch {
     return null;
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (!cdnUrl) {
-    return new NextResponse("Image not found", { status: 404 });
+    cdnUrl = `https://genshin-impact.fandom.com/wiki/Special:FilePath/${encodeURIComponent(sanitized)}`;
   }
 
   // Fetch the actual image server-side with Referer header
