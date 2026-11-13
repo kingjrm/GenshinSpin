@@ -77,10 +77,17 @@ export default function FilterPanel({
 
       {/* Search bar */}
       <div className="filter-search-wrap">
-        <span className="filter-search-icon" style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>&#9906;</span>
+        <svg
+          className="filter-search-icon"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="6.5" />
+          <path d="m16 16 4.5 4.5" />
+        </svg>
         <input
           type="text"
-          placeholder="   Search characters..."
+          placeholder="     Search characters..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="filter-search-input"

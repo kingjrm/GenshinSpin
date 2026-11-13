@@ -2901,19 +2901,28 @@ input:checked + .slider:before {
 }
 .filter-search-icon {
   position: absolute;
-  left: 10px;
-  font-size: 0.8rem;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   pointer-events: none;
   opacity: 0.6;
 }
 .filter-search-input {
   width: 100%;
-  padding: 9px 32px 9px 32px;
+  height: 38px;
+  padding: 8px 32px 8px 35px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   color: var(--text-light);
-  font-size: 0.85rem;
+  font-size: 0.7rem !important;
   font-family: var(--font-body);
   outline: none;
   transition: border-color 0.2s;
