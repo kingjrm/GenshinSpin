@@ -80,7 +80,7 @@ export default function RosterModal({
         <div className="rm-controls">
           {/* Search */}
           <div className="rm-search-wrap">
-            <span className="rm-search-icon">🔍</span>
+            <span className="rm-search-icon"></span>
             <input
               type="text"
               placeholder="Search characters…"
