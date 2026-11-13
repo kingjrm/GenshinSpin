@@ -213,8 +213,8 @@ export default function SpinHistory({ bossBattles = [], onClearHistory, onRetryB
               <select value={sortBy} onChange={(event) => setSortBy(event.target.value as "newest" | "oldest" | "fastest" | "slowest")}>
                 <option value="newest">Newest first</option>
                 <option value="oldest">Oldest first</option>
-                <option value="fastest">Fastest clear time</option>
-                <option value="slowest">Slowest clear time</option>
+                <option value="fastest">Fastest time</option>
+                <option value="slowest">Slowest time</option>
               </select>
             </div>
             <div className="history-expanded-list">
