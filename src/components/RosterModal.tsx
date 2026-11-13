@@ -194,8 +194,15 @@ export default function RosterModal({
                     {/* Inactive overlay */}
                     {!isActive && <div className="rm-card-off-overlay" />}
                     {/* Status badge */}
-                    <span className={`rm-card-status ${isActive ? "rm-status-on" : "rm-status-off"}`}>
-                      {isActive ? "ON" : "OFF"}
+                    <span
+                      className={`rm-card-status ${isActive ? "rm-status-on" : "rm-status-off"}`}
+                      aria-label={isActive ? "In roster" : "Not in roster"}
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        {isActive
+                          ? <path d="m5 12 4 4L19 6" />
+                          : <path d="m7 7 10 10M17 7 7 17" />}
+                      </svg>
                     </span>
                   </div>
 
