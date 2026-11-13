@@ -866,7 +866,7 @@ export default function Home() {
                 <div className="matchup-actions">
                   <div className="matchup-action-buttons">
                     <button onClick={handleSpinAgainBoss} className="boss-action-btn spin-again-btn">
-                      SPIN AGAIN
+                      NEW BOSS
                     </button>
                     <button onClick={handleResetWheel} className="boss-action-btn new-team-btn">
                       NEW TEAM
