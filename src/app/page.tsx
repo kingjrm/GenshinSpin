@@ -311,15 +311,12 @@ export default function Home() {
 
   const allCharactersSelectedGone = selectedNames.size === 0;
   const promoMessages = [
-    "Kiwich dabest mod",
     "jeumwoo was here!",
-    "ria sunget",
-    "durp enge welkin sige na",
-    "UY PILIPINSS!!!!!",
-    "VOTE WISELY",
-    "Shawawt Mga Beta Testers: Arquii, Justin Lim, Ponkan 🍊",
-    "Wishing u luck on 50/50",
-    "Snezhnaya na wahhhhh",
+    "Battle Records save your boss, team, challenger, result, and clear time.",
+    "Retry any recorded battle with the same boss and team.",
+    "Wishing you luck on your 50/50s!",
+    "Reset the wheel without deleting your Battle Records.",
+    "Customize the background from the settings panel.",
   ];
 
   return (
