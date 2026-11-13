@@ -92,7 +92,7 @@ export default function BossTimer({ seconds, onExpire, onStop, onReset, onComple
   return (
     <div className={`boss-timer ${expired ? "expired" : ""}`}>
       <div className="boss-timer-display" style={{ color: expired ? "#ff4444" : color }}>
-        {expired ? "TIME'S UP!" : `${mm}:${ss}.${ms}`}
+        {expired ? "TIME'S UP!" : <>{mm}:{ss}<span className="boss-timer-ms">.{ms}</span></>}
       </div>
       <div className="boss-timer-bar-track">
         <div

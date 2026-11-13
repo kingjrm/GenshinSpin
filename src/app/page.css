@@ -705,6 +705,26 @@ input:checked + .slider:before {
   color: #ffd0d0;
 }
 
+.history-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 9px;
+}
+
+.history-icon-btn svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .history-empty-state {
   display: flex;
   flex-direction: column;
@@ -971,6 +991,11 @@ input:checked + .slider:before {
   border-color: rgba(216, 179, 106, 0.65);
 }
 
+.history-filters select option {
+  background: #141b2a;
+  color: #f4f1e8;
+}
+
 .history-expanded-list {
   display: flex;
   flex-direction: column;
@@ -1066,6 +1091,23 @@ input:checked + .slider:before {
 
 .challenge-outcome-modal-buttons .challenge-outcome-btn {
   min-height: 46px;
+}
+
+.challenge-outcome-modal-buttons .challenge-outcome-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.challenge-outcome-modal-buttons .challenge-outcome-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .history-left {
@@ -3398,6 +3440,12 @@ input:checked + .slider:before {
   letter-spacing: 0.08em;
   line-height: 1;
   transition: color 0.3s;
+}
+
+.boss-timer-ms {
+  font-size: 0.58em;
+  letter-spacing: 0.04em;
+  opacity: 0.88;
 }
 
 .boss-timer-bar-track {

@@ -47,12 +47,30 @@ export default function SpinHistory({ bossBattles = [], onClearHistory }: SpinHi
         </div>
         <div className="history-header-actions">
           {bossBattles.length > 0 && (
-            <button onClick={() => setShowExpanded(true)} className="history-expand-btn">
-              Expand
+            <button
+              onClick={() => setShowExpanded(true)}
+              className="history-icon-btn history-expand-btn"
+              aria-label="Expand battle records"
+              title="Expand battle records"
+              type="button"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 3H3v5M3 3l7 7M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7M16 21h5v-5M21 21l-7-7" />
+              </svg>
             </button>
           )}
           {bossBattles.length > 0 && (
-            <button onClick={onClearHistory} className="history-clear-btn">Clear</button>
+            <button
+              onClick={onClearHistory}
+              className="history-icon-btn history-clear-btn"
+              aria-label="Clear battle records"
+              title="Clear battle records"
+              type="button"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" />
+              </svg>
+            </button>
           )}
         </div>
       </div>
