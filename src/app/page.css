@@ -3008,10 +3008,13 @@ input:checked + .slider:before {
 .bg-url-area {
   display: flex;
   gap: 6px;
+  min-width: 0;
 }
 
 .bg-url-input {
   flex: 1;
+  min-width: 0;
+  width: 0;
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -3027,6 +3030,7 @@ input:checked + .slider:before {
 }
 
 .bg-url-apply-btn {
+  flex: 0 0 auto;
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid rgba(216, 179, 106, 0.35);
