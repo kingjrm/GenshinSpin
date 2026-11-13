@@ -1106,6 +1106,18 @@ input:checked + .slider:before {
   font-size: 0.82rem;
 }
 
+.challenge-outcome-time {
+  margin: -8px 0 16px;
+  color: var(--text-gold);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
+.challenge-outcome-time strong {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+}
+
 .challenge-outcome-modal-buttons {
   display: flex;
   gap: 10px;
@@ -2641,6 +2653,16 @@ input:checked + .slider:before {
   background: rgba(255, 80, 60, 0.07);
 }
 .rm-btn-red:hover { background: rgba(255, 80, 60, 0.15); }
+.rm-btn-restore {
+  border-color: rgba(85, 255, 212, 0.28);
+  color: #80ffd9;
+  background: rgba(85, 255, 212, 0.07);
+}
+.rm-btn-restore:hover { background: rgba(85, 255, 212, 0.14); }
+.rm-btn-restore:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
 
 /* Character card grid */
 .rm-grid {

@@ -26,6 +26,14 @@ const getLocalDateTimeValue = () => {
   return new Date(now.getTime() - offset).toISOString().slice(0, 16);
 };
 
+const formatElapsedTime = (milliseconds: number) => {
+  const totalSeconds = milliseconds / 1000;
+  const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+  const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, "0");
+  const millis = Math.floor(milliseconds % 1000).toString().padStart(3, "0");
+  return `${minutes}:${seconds}.${millis}`;
+};
+
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
   const [fadeIntro, setFadeIntro] = useState(false);
@@ -215,6 +223,11 @@ export default function Home() {
     setSelectedNames(new Set(charactersData.map((c) => c.name)));
     setDisabledNames(new Set());
   }, [isSpinning]);
+
+  const handleRestoreDisabled = useCallback(() => {
+    setSelectedNames((prev) => new Set([...prev, ...disabledNames]));
+    setDisabledNames(new Set());
+  }, [disabledNames]);
 
   // Reset all filters to default
   const handleResetFilters = useCallback(() => {
@@ -635,6 +648,7 @@ export default function Home() {
           onSelectVisible={handleSelectVisible}
           onDeselectVisible={handleDeselectVisible}
           onResetPool={handleResetPool}
+          onRestoreDisabled={handleRestoreDisabled}
           onClose={() => setShowRosterModal(false)}
         />
       )}
@@ -894,6 +908,9 @@ export default function Home() {
               placeholder="Enter challenger name"
             />
             <p>Name the challenger before choosing an outcome.</p>
+            <div className="challenge-outcome-time">
+              Time: <strong>{formatElapsedTime(challengeElapsedMilliseconds)}</strong>
+            </div>
             <div className="challenge-outcome-modal-buttons">
               <button
                 className="challenge-outcome-btn challenge-success-btn"
