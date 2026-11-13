@@ -22,26 +22,46 @@ interface SpinHistoryProps {
 
 export default function SpinHistory({ bossBattles = [], onClearHistory }: SpinHistoryProps) {
   const [selectedBattle, setSelectedBattle] = React.useState<BossBattleRecord | null>(null);
+  const [showExpanded, setShowExpanded] = React.useState(false);
+  const [search, setSearch] = React.useState("");
+  const [outcomeFilter, setOutcomeFilter] = React.useState<"all" | "won" | "lost">("all");
+  const [regionFilter, setRegionFilter] = React.useState("all");
+
+  const regions = Array.from(new Set(bossBattles.map((battle) => battle.boss.region))).sort();
+  const filteredBattles = bossBattles.filter((battle) => {
+    const query = search.trim().toLowerCase();
+    const matchesSearch = !query
+      || battle.boss.name.toLowerCase().includes(query)
+      || battle.challengerName.toLowerCase().includes(query);
+    const matchesOutcome = outcomeFilter === "all" || battle.outcome === outcomeFilter;
+    const matchesRegion = regionFilter === "all" || battle.boss.region === regionFilter;
+    return matchesSearch && matchesOutcome && matchesRegion;
+  });
 
   return (
     <div className="glass-panel history-panel p-5 flex flex-col w-full h-full">
       <div className="history-header">
         <div>
-          <h2 className="history-title">Spin History</h2>
+          <h2 className="history-title">Battle Record</h2>
           <p className="history-subtitle">Session Records</p>
         </div>
-        {bossBattles.length > 0 && (
-          <button onClick={onClearHistory} className="history-clear-btn">
-            Clear
-          </button>
-        )}
+        <div className="history-header-actions">
+          {bossBattles.length > 0 && (
+            <button onClick={() => setShowExpanded(true)} className="history-expand-btn">
+              Expand
+            </button>
+          )}
+          {bossBattles.length > 0 && (
+            <button onClick={onClearHistory} className="history-clear-btn">Clear</button>
+          )}
+        </div>
       </div>
 
       {bossBattles.length === 0 ? (
         <div className="history-empty-state">
           <span className="history-empty-icon" style={{ fontFamily: "var(--font-header)", fontSize: "1.5rem", color: "var(--text-gold)", opacity: 0.4 }}>&#9654;</span>
-          <p className="history-empty-title">No spins recorded yet.</p>
-          <p className="history-empty-text">Launch the wheel to see your records here.</p>
+          <p className="history-empty-title">No battles recorded yet.</p>
+          <p className="history-empty-text">Complete a boss battle to see your records here.</p>
         </div>
       ) : (
         <div className="history-list overflow-y-auto max-h-[300px] pr-1">
@@ -109,6 +129,68 @@ export default function SpinHistory({ bossBattles = [], onClearHistory }: SpinHi
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {showExpanded && (
+        <div className="history-expanded-overlay" onClick={() => setShowExpanded(false)}>
+          <div className="history-expanded-card" onClick={(event) => event.stopPropagation()}>
+            <div className="history-expanded-header">
+              <div>
+                <span className="history-detail-kicker">Session Records</span>
+                <h2>Battle Record</h2>
+              </div>
+              <button
+                className="history-detail-close"
+                onClick={() => setShowExpanded(false)}
+                aria-label="Close battle records"
+                type="button"
+              >
+                &#10005;
+              </button>
+            </div>
+            <div className="history-filters">
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search boss or challenger"
+                aria-label="Search battle records"
+              />
+              <select value={outcomeFilter} onChange={(event) => setOutcomeFilter(event.target.value as "all" | "won" | "lost")}>
+                <option value="all">All outcomes</option>
+                <option value="won">Success</option>
+                <option value="lost">Failed</option>
+              </select>
+              <select value={regionFilter} onChange={(event) => setRegionFilter(event.target.value)}>
+                <option value="all">All regions</option>
+                {regions.map((region) => <option key={region} value={region}>{region}</option>)}
+              </select>
+            </div>
+            <div className="history-expanded-list">
+              {filteredBattles.length === 0 ? (
+                <p className="history-expanded-empty">No battle records match these filters.</p>
+              ) : filteredBattles.map((battle, index) => (
+                <button
+                  key={`${battle.boss.name}-${battle.dateTime}-${index}`}
+                  className="history-expanded-row"
+                  onClick={() => setSelectedBattle(battle)}
+                  type="button"
+                >
+                  <BossImage boss={battle.boss} size={48} shape="rect" />
+                  <div className="history-expanded-main">
+                    <strong>{battle.boss.name}</strong>
+                    <span>{battle.challengerName} · {battle.boss.region}</span>
+                  </div>
+                  <span className={`history-expanded-outcome ${battle.outcome === "won" ? "battle-success" : "battle-failure"}`}>
+                    {battle.outcome === "won" ? "Success" : "Failed"}
+                  </span>
+                  <strong className="history-expanded-time">
+                    {(battle.elapsedMilliseconds / 1000).toFixed(3)}s
+                  </strong>
+                  <span className="history-expanded-date">{new Date(battle.dateTime).toLocaleDateString()}</span>
+                </button>
+              ))}
             </div>
           </div>
         </div>

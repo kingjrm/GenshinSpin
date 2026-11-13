@@ -52,6 +52,7 @@ export default function BossWheel({
   const targetAngleRef = useRef(0);
   const isSpinningRef  = useRef(isSpinning);
   const lastSegmentRef = useRef(-1);
+  const lastFrameTimeRef = useRef(0);
 
   useEffect(() => {
     isSpinningRef.current = isSpinning;
@@ -96,7 +97,7 @@ export default function BossWheel({
     return () => clearTimeout(timeout);
   }, [activeBosses]);
 
-  const drawWheel = useCallback(() => {
+  const drawWheel = useCallback((animating = false) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -153,7 +154,7 @@ export default function BossWheel({
       ctx.stroke();
 
       // ── Draw boss image in slice ─────────────────────────────────────────
-      if (N <= 60) {
+      if (N <= 60 && (!animating || N <= 24)) {
         const img = imgMap.get(boss.name);
         if (img) {
           // Position image along the mid-radius of the slice
@@ -181,7 +182,7 @@ export default function BossWheel({
       }
 
       // ── Draw text label ──────────────────────────────────────────────────
-      if (N <= 36) {
+      if (N <= 36 && (!animating || N <= 24)) {
         ctx.save();
         ctx.translate(center, center);
         ctx.rotate(midAngle);
@@ -252,6 +253,7 @@ export default function BossWheel({
 
     const duration = 5500;
     const startTime = performance.now();
+    lastFrameTimeRef.current = startTime - 33;
     const easeOut = (x: number) => 1 - Math.pow(1 - x, 4);
 
     const animate = (now: number) => {
@@ -266,11 +268,15 @@ export default function BossWheel({
         setTimeout(() => setTickerWobble(false), 50);
       }
 
-      drawWheel();
+      if (now - lastFrameTimeRef.current >= 33 || t === 1) {
+        lastFrameTimeRef.current = now;
+        drawWheel(true);
+      }
 
       if (t < 1) {
         requestAnimationFrame(animate);
       } else {
+        drawWheel();
         setIsSpinning(false);
         onSpinComplete(activeBosses[targetIndex]);
       }

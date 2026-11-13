@@ -15,10 +15,10 @@ const MAX_FILE_MB = 8; // max base64 image size to store
 
 const DEFAULT: BgSettings = {
   imageDataUrl: undefined,
-  imageUrl: undefined,
-  opacity: 85,
-  blur: 0,
-  brightness: 70,
+  imageUrl: "/mitya.png",
+  opacity: 40,
+  blur: 5,
+  brightness: 45,
 };
 
 function loadSettings(): BgSettings {
@@ -27,10 +27,16 @@ function loadSettings(): BgSettings {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return DEFAULT;
     const parsed = JSON.parse(raw);
+    const imageDataUrl = typeof parsed.imageDataUrl === "string" ? parsed.imageDataUrl : undefined;
+    const imageUrl = typeof parsed.imageUrl === "string"
+      ? parsed.imageUrl
+      : imageDataUrl
+        ? undefined
+        : DEFAULT.imageUrl;
     // Validate parsed values are within expected ranges
     return {
-      imageDataUrl: typeof parsed.imageDataUrl === "string" ? parsed.imageDataUrl : undefined,
-      imageUrl: typeof parsed.imageUrl === "string" ? parsed.imageUrl : undefined,
+      imageDataUrl,
+      imageUrl,
       opacity: typeof parsed.opacity === "number" && parsed.opacity >= 10 && parsed.opacity <= 100 ? parsed.opacity : DEFAULT.opacity,
       blur: typeof parsed.blur === "number" && parsed.blur >= 0 && parsed.blur <= 20 ? parsed.blur : DEFAULT.blur,
       brightness: typeof parsed.brightness === "number" && parsed.brightness >= 20 && parsed.brightness <= 150 ? parsed.brightness : DEFAULT.brightness,
