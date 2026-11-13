@@ -11,7 +11,6 @@ interface RosterModalProps {
   onSelectVisible: (names: string[]) => void;
   onDeselectVisible: (names: string[]) => void;
   onResetPool: () => void;
-  onRestoreDisabled: () => void;
   onClose: () => void;
 }
 
@@ -37,7 +36,6 @@ export default function RosterModal({
   onSelectVisible,
   onDeselectVisible,
   onResetPool,
-  onRestoreDisabled,
   onClose,
 }: RosterModalProps) {
   const [search, setSearch] = useState("");
@@ -153,13 +151,6 @@ export default function RosterModal({
             </button>
             <button onClick={onResetPool} className="rm-action-btn rm-btn-red">
               ↺ Reset to Default
-            </button>
-            <button
-              onClick={onRestoreDisabled}
-              className="rm-action-btn rm-btn-restore"
-              disabled={selectedCount === charactersData.length}
-            >
-              ↻ Restore Crossed-Out
             </button>
           </div>
         </div>

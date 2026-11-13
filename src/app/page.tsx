@@ -72,7 +72,6 @@ export default function Home() {
 
   // Optional boss rules
   const [bossTimeLimit, setBossTimeLimit] = useState<number | null>(null);
-  const [weaponReq, setWeaponReq] = useState<"any" | "4star" | "5star">("any");
   const [customTimeMin, setCustomTimeMin] = useState<string>("");
   const [customTimeSec, setCustomTimeSec] = useState<string>("");
 
@@ -94,11 +93,9 @@ export default function Home() {
     return team.slice(0, teamSize);
   }, [team, teamSize]);
 
-  // Helper: randomly pick weapon req and time limit
+  // Randomize the default time limit for each new boss.
   const pickRules = React.useCallback(() => {
-    const weapons = ["any", "4star", "5star"] as const;
     const times = [60, 120, 180, 300] as const;
-    setWeaponReq(weapons[Math.floor(Math.random() * weapons.length)]);
     setBossTimeLimit(times[Math.floor(Math.random() * times.length)]);
   }, []);
 
@@ -224,11 +221,6 @@ export default function Home() {
     setDisabledNames(new Set());
   }, [isSpinning]);
 
-  const handleRestoreDisabled = useCallback(() => {
-    setSelectedNames((prev) => new Set([...prev, ...disabledNames]));
-    setDisabledNames(new Set());
-  }, [disabledNames]);
-
   // Reset all filters to default
   const handleResetFilters = useCallback(() => {
     setSearch("");
@@ -262,10 +254,14 @@ export default function Home() {
       setHistory((prev) => [character, ...prev]);
       setTeam((prev) => prev.length < teamSize ? [...prev, character] : prev);
       if (removeAfterSpin) {
-        handleRemoveCharacter(character.name);
+        setSelectedNames((prev) => {
+          const next = new Set(prev);
+          next.delete(character.name);
+          return next;
+        });
       }
     },
-    [removeAfterSpin, handleRemoveCharacter, teamSize]
+    [removeAfterSpin, teamSize]
   );
 
   // Clear spin history list
@@ -320,7 +316,7 @@ export default function Home() {
 
   // Global reset wheel
   const handleResetWheel = useCallback(() => {
-    setSelectedNames(new Set(charactersData.filter((character) => disabledNames.has(character.name) === false).map((character) => character.name)));
+    setSelectedNames(new Set(charactersData.filter((character) => !disabledNames.has(character.name)).map((character) => character.name)));
     handleResetFilters();
     setResult(null);
     setRemoveAfterSpin(true);
@@ -338,7 +334,6 @@ export default function Home() {
     setIsChallengeTimerComplete(false);
     setChallengeElapsedMilliseconds(0);
     setBossTimeLimit(null);
-    setWeaponReq("any");
     setIsRetryingBattle(false);
   }, [disabledNames, handleResetFilters]);
 
@@ -648,7 +643,6 @@ export default function Home() {
           onSelectVisible={handleSelectVisible}
           onDeselectVisible={handleDeselectVisible}
           onResetPool={handleResetPool}
-          onRestoreDisabled={handleRestoreDisabled}
           onClose={() => setShowRosterModal(false)}
         />
       )}
@@ -734,23 +728,6 @@ export default function Home() {
                 {/* Auto-picked rules display */}
                 <div className="boss-rules-row">
                   <div className="boss-rule-display">
-                    <span className="boss-rule-display-label">&#9876; Weapon</span>
-                    <span
-                      className="boss-rule-display-val"
-                      style={{
-                        color: weaponReq === "5star" ? "var(--rarity-5)"
-                          : weaponReq === "4star" ? "var(--rarity-4)"
-                          : "var(--text-muted)",
-                        borderColor: weaponReq === "5star" ? "var(--rarity-5)"
-                          : weaponReq === "4star" ? "var(--rarity-4)"
-                          : "rgba(255,255,255,0.12)",
-                      }}
-                    >
-                      {weaponReq === "any" ? "Any" : weaponReq === "4star" ? "4\u2605+" : "5\u2605 Only"}
-                    </span>
-                  </div>
-
-                  <div className="boss-rule-display">
                     <span className="boss-rule-display-label">&#9201; Time</span>
                     <span className="boss-rule-display-val" style={{ color: "var(--text-gold)", borderColor: "rgba(216,179,106,0.35)" }}>
                       {bossTimeLimit !== null ? (bossTimeLimit < 60 ? `${bossTimeLimit}s` : bossTimeLimit % 60 === 0 ? `${bossTimeLimit / 60}m` : `${Math.floor(bossTimeLimit/60)}m${bossTimeLimit%60}s`) : "--"}
@@ -799,13 +776,6 @@ export default function Home() {
                     </button>
                   </div>
 
-                  <button
-                    className="boss-randomize-btn"
-                    onClick={pickRules}
-                    title="Re-roll rules"
-                  >
-                    &#9880; Re-roll
-                  </button>
                 </div>
 
                 {/* Timer display — always shown in matchup, bossTimeLimit is auto-picked */}
