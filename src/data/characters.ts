@@ -7,6 +7,34 @@ export interface Character {
   image: string;
 }
 
+const FEMALE_CHARACTER_NAMES = new Set([
+  "Aino", "Aloy", "Amber", "Arlecchino", "Barbara", "Beidou", "Candace", "Charlotte",
+  "Chasca", "Chevreuse", "Chiori", "Citlali", "Columbina", "Dahlia", "Dehya", "Diona",
+  "Dori", "Emilie", "Eula", "Faruzan", "Fischl", "Furina", "Ganyu", "Hu Tao", "Iansan",
+  "Ineffa", "Jahoda", "Jean", "Kachina", "Keqing", "Kirara", "Klee", "Kujou Sara",
+  "Kuki Shinobu", "Lan Yan", "Lauma", "Layla", "Linnea", "Lisa", "Mavuika", "Mona",
+  "Mualani", "Nahida", "Navia", "Nefer", "Nicole", "Nilou", "Ningguang", "Noelle",
+  "Odette", "Prune", "Qiqi", "Raiden Shogun", "Rosaria", "Sandrone", "Sangonomiya Kokomi",
+  "Sayu", "Shenhe", "Sigewinne", "Skirk", "Sucrose", "Varesa", "Vesna", "Vodyanitsa",
+  "Xianyun", "Xilonen", "Xinyan", "Yae Miko", "Yanfei", "Yaoyao", "Yelan", "Yoimiya",
+  "Yumemizuki Mizuki", "Yun Jin",
+]);
+
+export const getCharacterGender = (name: string): "male" | "female" => (
+  FEMALE_CHARACTER_NAMES.has(name) ? "female" : "male"
+);
+
+export const CHARACTER_TEAMS: Record<string, string[]> = {
+  Hexerei: ["Venti", "Klee", "Albedo", "Mona", "Durin", "Varka", "Nicole", "Lohen", "Fischl", "Sucrose", "Razor", "Prune"],
+  Moonsign: ["Aino", "Columbina", "Flins", "Illuga", "Ineffa", "Jahoda", "Lauma", "Linnea", "Nefer", "Zibai"],
+};
+
+export const getCharacterTeams = (name: string): string[] => (
+  Object.entries(CHARACTER_TEAMS)
+    .filter(([, members]) => members.includes(name))
+    .map(([team]) => team)
+);
+
 // Map display name → Enka internal UI icon name (without UI_AvatarIcon_ prefix and .png)
 // Enka CDN: https://enka.network/ui/UI_AvatarIcon_{key}.png
 const ENKA_ICON_MAP: Record<string, string> = {

@@ -7,6 +7,8 @@ export interface FilterState {
   elements: string[];
   weapons: string[];
   regions: string[];
+  gender: "all" | "male" | "female";
+  teams: string[];
 }
 
 interface FilterPanelProps {
@@ -39,6 +41,7 @@ const REGION_PILLS = [
 ];
 
 const WEAPON_TYPES = ["Sword", "Claymore", "Polearm", "Bow", "Catalyst"];
+const TEAMS = ["Hexerei", "Moonsign"];
 
 function toggleArr(arr: string[], val: string): string[] {
   return arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val];
@@ -56,7 +59,9 @@ export default function FilterPanel({
     filters.rarity !== "all" ||
     filters.elements.length > 0 ||
     filters.weapons.length > 0 ||
-    filters.regions.length > 0;
+    filters.regions.length > 0 ||
+    filters.gender !== "all" ||
+    filters.teams.length > 0;
 
   return (
     <div className="filter-panel-v2 glass-panel p-5 flex flex-col gap-4 w-full">
@@ -139,6 +144,26 @@ export default function FilterPanel({
             );
           })}
         </div>
+
+        {/* Gender */}
+        <div className="flex flex-col gap-2">
+          <label className="filter-section-label">Gender</label>
+          <div className="filter-weapon-wrap">
+            {[
+              { label: "All", value: "all" },
+              { label: "Male", value: "male" },
+              { label: "Female", value: "female" },
+            ].map((gender) => (
+              <button
+                key={gender.value}
+                onClick={() => setFilters({ ...filters, gender: gender.value as FilterState["gender"] })}
+                className={`filter-weapon-btn ${filters.gender === gender.value ? "active" : ""}`}
+              >
+                {gender.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Weapon — multi-select */}
@@ -187,6 +212,30 @@ export default function FilterPanel({
               </button>
             );
           })}
+        </div>
+
+        {/* Teams — multi-select */}
+        <div className="flex flex-col gap-2">
+          <label className="filter-section-label">
+            Team
+            {filters.teams.length > 0 && (
+              <span className="filter-count-badge">{filters.teams.length}</span>
+            )}
+          </label>
+          <div className="filter-region-wrap">
+            {TEAMS.map((team) => {
+              const isActive = filters.teams.includes(team.toLowerCase());
+              return (
+                <button
+                  key={team}
+                  onClick={() => setFilters({ ...filters, teams: toggleArr(filters.teams, team.toLowerCase()) })}
+                  className={`filter-region-btn ${isActive ? "active" : ""}`}
+                >
+                  {team}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

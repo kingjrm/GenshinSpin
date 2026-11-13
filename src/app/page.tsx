@@ -2,12 +2,11 @@
 
 import React, { useState, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { charactersData, Character } from "@/data/characters";
+import { charactersData, Character, getCharacterGender, getCharacterTeams } from "@/data/characters";
 import { worldBosses, weeklyBosses, localLegends, underwaterBosses, nightsoulTotems, bossesData, Boss, getBossImageUrl, getRegionElement } from "@/data/bosses";
 import Wheel from "@/components/Wheel";
 import BossWheel from "@/components/BossWheel";
 import FilterPanel, { FilterState } from "@/components/FilterPanel";
-import CharacterPool from "@/components/CharacterPool";
 import RosterModal from "@/components/RosterModal";
 import ResultCard from "@/components/ResultCard";
 import BossResultCard from "@/components/BossResultCard";
@@ -47,6 +46,8 @@ export default function Home() {
     elements: [],
     weapons: [],
     regions: [],
+    gender: "all",
+    teams: [],
   });
   const [showRosterModal, setShowRosterModal] = useState(false);
   const [teamSize, setTeamSize] = useState<1 | 2 | 3 | 4>(4);
@@ -143,6 +144,8 @@ export default function Home() {
       if (filters.elements.length > 0 && !filters.elements.includes(char.element.toLowerCase())) return false;
       if (filters.weapons.length > 0 && !filters.weapons.includes(char.weapon.toLowerCase())) return false;
       if (filters.regions.length > 0 && !filters.regions.includes(char.region.toLowerCase())) return false;
+      if (filters.gender !== "all" && getCharacterGender(char.name) !== filters.gender) return false;
+      if (filters.teams.length > 0 && !getCharacterTeams(char.name).some((team) => filters.teams.includes(team.toLowerCase()))) return false;
       return true;
     });
   }, [search, filters]);
@@ -184,36 +187,6 @@ export default function Home() {
     });
   }, [isSpinning, selectedNames]);
 
-  // Select all filtered characters
-  const handleSelectAll = useCallback(() => {
-    if (isSpinning) return;
-    setSelectedNames((prev) => {
-      const next = new Set(prev);
-      filteredCharacters.forEach((c) => next.add(c.name));
-      return next;
-    });
-    setDisabledNames((prev) => {
-      const next = new Set(prev);
-      filteredCharacters.forEach((c) => next.delete(c.name));
-      return next;
-    });
-  }, [isSpinning, filteredCharacters]);
-
-  // Deselect all filtered characters
-  const handleDeselectAll = useCallback(() => {
-    if (isSpinning) return;
-    setSelectedNames((prev) => {
-      const next = new Set(prev);
-      filteredCharacters.forEach((c) => next.delete(c.name));
-      return next;
-    });
-    setDisabledNames((prev) => {
-      const next = new Set(prev);
-      filteredCharacters.forEach((c) => next.add(c.name));
-      return next;
-    });
-  }, [isSpinning, filteredCharacters]);
-
   // Reset the pool to default checked state (all 118 checked)
   const handleResetPool = useCallback(() => {
     if (isSpinning) return;
@@ -229,6 +202,8 @@ export default function Home() {
       elements: [],
       weapons: [],
       regions: [],
+      gender: "all",
+      teams: [],
     });
   }, []);
 
@@ -449,15 +424,6 @@ export default function Home() {
               filters={filters}
               setFilters={setFilters}
               onResetFilters={handleResetFilters}
-            />
-            <CharacterPool
-              characters={filteredCharacters}
-              selectedNames={selectedNames}
-              onToggleCharacter={handleToggleCharacter}
-              onSelectAll={handleSelectAll}
-              onDeselectAll={handleDeselectAll}
-              onResetPool={handleResetPool}
-              totalCount={charactersData.length}
             />
           </aside>
 
